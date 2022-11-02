@@ -18,12 +18,12 @@ const DetailScreen = ({ navigation }) => {
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
-  }, []);
+  },);
 
 if (initializing) return null;
   const SignOut = () => {
     auth().signOut().then(() => { console.log("Sign out"); }).catch(error=>console.error(error))
-}
+} 
 
   return (
     <Provider store={store}>

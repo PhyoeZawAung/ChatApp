@@ -2,6 +2,8 @@ import { View, Text, Button,Image } from "react-native"
 import React , {useState} from "react";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import storage from "@react-native-firebase/storage";
+import auth from "@react-native-firebase/auth";
+import { useSelector } from "react-redux";
 const ImageUploader = ({navigation}) => {
   const [image, setImage] = useState();
   const getImageFromCamera = async() => 
@@ -16,7 +18,15 @@ const ImageUploader = ({navigation}) => {
     setImage(result)
    
   }
+
+  const setUserName = async(name) => {
+    await auth().currentUser.updateProfile({ displayName: name })
+    console.log("Updated User name");
+  }
   
+  const firstName = useSelector((store) => store.firstName);
+  const lastName = useSelector((store) => store.lastName);
+  const name = firstName + " " + lastName;
   return (
     <View>
       <Text>Image Uploader</Text>
@@ -43,7 +53,11 @@ const ImageUploader = ({navigation}) => {
           console.log('Image uploaded to the bucket!');
         });
       }} />
-      <Button title="Skip" onPress={()=>{navigation.navigate("Detail")}}/>
+      <Button title="Skip" onPress={() => {
+        setUserName(name);
+        navigation.navigate("Detail")
+        
+      }} />
    </View>
  )
 }
