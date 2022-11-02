@@ -1,10 +1,14 @@
 import React, {useState} from 'react';
-
+import { useSelector, useDispatch } from 'react-redux';
+import { SetUser } from '../Redux/User/UserAction';
 import {View, Text, TextInput, Pressable, StyleSheet,ToastAndroid} from 'react-native';
 import auth from '@react-native-firebase/auth';
-
 const SignUpScreen = ({navigation}) => {
   const [showhide, setShowHide] = useState(true);
+  const dispatch = useDispatch();
+  const setUserName = (firstName,lastName) => {
+    dispatch(SetUser({ firstName: firstName, lastName: lastName }));
+  }
   const Show = showhide => {
     if (showhide == true) {
       return false;
@@ -22,6 +26,7 @@ const SignUpScreen = ({navigation}) => {
             ToastAndroid.SHORT,
             ToastAndroid.BOTTOM,
           )
+          
       
         })
         .catch(error => {
@@ -35,10 +40,18 @@ const SignUpScreen = ({navigation}) => {
 
           console.error(error);
         });
+        
+        
+     
     }
   };
+
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
   return (
     <View style={styles.container}>
       <View style={styles.signUpCard}>
@@ -49,10 +62,12 @@ const SignUpScreen = ({navigation}) => {
           <View style={styles.name}>
             <TextInput
               style={styles.nameInput}
-              placeholder="first name"></TextInput>
+              placeholder="first name"
+              onChangeText={(text) => { setFirstName(text) }}></TextInput>
             <TextInput
               style={styles.nameInput}
-              placeholder="last name"></TextInput>
+              placeholder="last name"
+            onChangeText={(text) =>{setLastName(text)}}></TextInput>
           </View>
           <TextInput
             placeholder="example@gmail.com"
@@ -101,6 +116,7 @@ const SignUpScreen = ({navigation}) => {
             style={styles.button}
             onPress={() => {
               signup(email, password);
+              setUserName(firstName,lastName);
             }}>
             <Text style={{color: '#fff', fontWeight: 'bold'}}>Register</Text>
           </Pressable>
