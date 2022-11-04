@@ -3,7 +3,8 @@ import React , {useState} from "react";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import storage from "@react-native-firebase/storage";
 import auth from "@react-native-firebase/auth";
-import { useSelector } from "react-redux";
+import { useSelector, Provider } from "react-redux";
+import { StackActions } from "@react-navigation/native";
 const ImageUploader = ({navigation}) => {
   const [image, setImage] = useState();
   const getImageFromCamera = async() => 
@@ -22,8 +23,15 @@ const ImageUploader = ({navigation}) => {
   const setUserName = async(name) => {
     await auth().currentUser.updateProfile({ displayName: name })
     console.log("Updated User name");
+    console.log(auth().currentUser.displayName);
+    navigation.dispatch(StackActions.replace("Detail"));
   }
   
+  const setProfilePhoto = async(url) => {
+    await auth().currentUser.updateProfile({ photoURL: url })
+    console.log("Add Profile Photo");
+    alert("Profile set");
+  }
   const firstName = useSelector((store) => store.firstName);
   const lastName = useSelector((store) => store.lastName);
   const name = firstName + " " + lastName;
@@ -40,7 +48,8 @@ const ImageUploader = ({navigation}) => {
       
       <Button title="Upload to firebase" onPress={async() => {
        // path to existing file on filesystem
-       const reference = storage().ref("images/"+image.assets[0].uri);
+       const refUrl = "images/" + auth().currentUser.uid + "_profile_photo.jpg";
+       const reference = storage().ref(refUrl);
        const pathToFile = image.assets[0].uri;
        // uploads file
        const task = reference.putFile(pathToFile);
@@ -51,11 +60,17 @@ const ImageUploader = ({navigation}) => {
 
         task.then(() => {
           console.log('Image uploaded to the bucket!');
+          alert("Imgae Uploaded");
         });
+        
       }} />
+      <Button title="set profile" onPress={async () => {
+        const refUrl = "images/" + auth().currentUser.uid + "_profile_photo.jpg";
+        const url = await storage().ref(refUrl).getDownloadURL();
+        setProfilePhoto(url);
+      }}/>
       <Button title="Skip" onPress={() => {
         setUserName(name);
-        navigation.navigate("Detail")
         
       }} />
    </View>

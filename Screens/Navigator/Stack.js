@@ -13,23 +13,23 @@ import store from "../../Redux/stroe";
 import { Provider } from "react-redux";
 import auth from "@react-native-firebase/auth";
 const Stack = createStackNavigator();
+
 const StackScreen = () => 
 {
 
     // Set an initializing state whilst Firebase connects
     const [initializing, setInitializing] = useState(true);
     const [user, setUser] = useState();
-  
     // Handle user state changes
     function onAuthStateChanged(user) {
       setUser(user);
-      if (initializing) setInitializing(false);
+      if (initializing) setInitializing(false); 
     }
   
     useEffect(() => {
       const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-      return subscriber; // unsubscribe on unmount
-    }, []);
+      // unsubscribe on unmount
+    });
   
   if (initializing) return null;
   
@@ -42,11 +42,26 @@ const StackScreen = () =>
                 <Stack.Screen name="Login" component={LoginScreen} />
                 <Stack.Screen name="SignUp" component={SignUpScreen} />
                 <Stack.Screen name="Forgot" component={ForgotScreen} />
+                
             </Stack.Group>
-        ) : (
-            <Stack.Group>
-              <Stack.Screen name="Upload" component={ImageUploader}/>
-              <Stack.Screen name="Detail" component={DetailScreen} />
+          ) : (
+              
+              <Stack.Group>
+                {user.displayName == null ? (
+                  <>
+                    <Stack.Screen name="Upload" component={ImageUploader} />
+                    <Stack.Screen name="Detail" component={DetailScreen} />
+                  </>
+                  
+                ) : (
+                    <>
+                       <Stack.Screen name="Detail" component={DetailScreen} />
+                    </>
+                 
+                )}
+              
+              
+              
             </Stack.Group>
         )}
 

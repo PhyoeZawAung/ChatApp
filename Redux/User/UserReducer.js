@@ -2,7 +2,8 @@
 
 const initialState = {
   firstName: "",
-  lastName:"",
+  lastName: "",
+  nameAdded:false,
 }
 
 export default (state = initialState, action) => {
@@ -12,6 +13,7 @@ export default (state = initialState, action) => {
         ...state,
         firstName:action.payload.firstName,
         lastName: action.payload.lastName,
+        nameAdded:action.payload.nameAdded,
       };
     
     default:

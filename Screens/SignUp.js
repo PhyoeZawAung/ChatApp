@@ -1,13 +1,14 @@
 import React, {useState} from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch ,Provider} from 'react-redux';
 import { SetUser } from '../Redux/User/UserAction';
 import {View, Text, TextInput, Pressable, StyleSheet,ToastAndroid} from 'react-native';
 import auth from '@react-native-firebase/auth';
+import store from '../Redux/stroe';
 const SignUpScreen = ({navigation}) => {
   const [showhide, setShowHide] = useState(true);
   const dispatch = useDispatch();
   const setUserName = (firstName,lastName) => {
-    dispatch(SetUser({ firstName: firstName, lastName: lastName }));
+    dispatch(SetUser({ firstName: firstName, lastName: lastName,nameAdded:true }));
   }
   const Show = showhide => {
     if (showhide == true) {
