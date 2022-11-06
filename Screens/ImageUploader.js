@@ -116,6 +116,7 @@ const ImageUploader = ({navigation}) => {
   const lastName = useSelector((store) => store.lastName);
   const [image, setImage] = useState();
   const [load, setLoad] = useState(false);
+  const [loadingText, setLoadingText] = useState("");
   const toggleChoice = () => {
     setChoice(!choice);
     if (choice) {
@@ -156,20 +157,25 @@ const ImageUploader = ({navigation}) => {
 
         task.on('state_changed', taskSnapshot => {
           console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
+          setLoadingText(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
         });
 
         task.then(async() => {
           console.log('Image uploaded to the bucket!');
           console.log("Imgae Uploaded");
+          setLoadingText("Imgae Uploaded")
           const url = await storage().ref(refUrl).getDownloadURL();
           console.log("Get download url" +JSON.stringify(url) );
           await auth().currentUser.updateProfile({ photoURL: url })
           console.log("Add Profile Photo");
           console.log("Profile set");
+          setLoadingText("Profile set")
           await user.updateProfile({ displayName: name })
           console.log("Profile name set");
+          setLoadingText("Profile name set")
+          setLoadingText("Done");
           navigation.dispatch(StackActions.replace("Detail"));
-          setLoad(false)
+          setLoad(false);
         });
        
        
@@ -254,7 +260,8 @@ const ImageUploader = ({navigation}) => {
             
           </Dialog>
           <Dialog isVisible={load} overlayStyle={{backgroundColor:"#fff",borderRadius:10}} >
-            <Dialog.Title title='Setting Up Your Profile'/>
+            <Dialog.Title title='Setting Up Your Profile' />
+            <Text>{loadingText}</Text>
             
             <Dialog.Loading />
           </Dialog>
