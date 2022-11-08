@@ -17,7 +17,7 @@ const LoginScreen = ({navigation}) => {
         .then(() => {
           console.log('User account created & signed in!');
           //alert('signed in!');
-          navigation.navigate("Message");
+          //navigation.navigate("Message");
          
         })
         .catch(error => {

@@ -3,8 +3,11 @@ import React, { useState } from "react";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import storage from "@react-native-firebase/storage";
 import auth from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
 import { useSelector } from "react-redux";
+
 const ImageUploader = ({ navigation }) => {
+
   const [image, setImage] = useState();
   const getImageFromCamera = async () => {
     const result = await launchCamera();
@@ -30,7 +33,8 @@ const ImageUploader = ({ navigation }) => {
     <View>
       <Text>Image Uploader</Text>
       <Button title="
-      launch camera" onPress={getImageFromCamera}></Button>
+        launch camera" onPress={getImageFromCamera}>
+      </Button>
       <Button title="Select Image" onPress={selectImage} />
       <Text>{JSON.stringify(image)}</Text>
       <Text>djlddjll;</Text>
@@ -41,6 +45,9 @@ const ImageUploader = ({ navigation }) => {
         // path to existing file on filesystem
         const reference = storage().ref("images/" + image.assets[0].uri);
         const pathToFile = image.assets[0].uri;
+
+        
+
         // uploads file
         const task = reference.putFile(pathToFile);
 
@@ -48,7 +55,13 @@ const ImageUploader = ({ navigation }) => {
           console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
         });
 
-        task.then(() => {
+        task.then( (cred) => {
+          firestore()
+          .collection("users")
+          .doc(cred.user.uid)
+          .set({
+            photoUrl: pathToFile,
+          })
           console.log('Image uploaded to the bucket!');
         });
       }} />

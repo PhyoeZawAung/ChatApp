@@ -3,7 +3,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { SetUser } from '../Redux/User/UserAction';
 import {View, Text, TextInput, Pressable, StyleSheet,ToastAndroid} from 'react-native';
 import auth from '@react-native-firebase/auth';
+import firestore from "@react-native-firebase/firestore";
+
 const SignUpScreen = ({navigation}) => {
+
   const [showhide, setShowHide] = useState(true);
   const dispatch = useDispatch();
   const setUserName = (firstName,lastName) => {
@@ -14,13 +17,15 @@ const SignUpScreen = ({navigation}) => {
       return false;
     } else return true;
   };
+
+  /*
   const signup = (email, password) => {
     if (email != '' && password != '') {
       auth()
         .createUserWithEmailAndPassword(email, password)
         .then(() => {
           console.log('User account created & signed in!');
-          navigation.navigate("Message");
+          //navigation.navigate("Message");
           
           ToastAndroid.showWithGravity(
             "Account Create Successfully",
@@ -46,7 +51,40 @@ const SignUpScreen = ({navigation}) => {
      
     }
   };
+*/
 
+const signup = async (email, password, firstName, lastName) => {
+
+  try {
+    await auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then( (cred) => {
+        firestore()
+          .collection("users")
+          .doc(cred.user.uid)
+          .set({
+            firstName,
+            lastName,
+            email,
+            password,
+          })
+        navigation.navigate("Upload", {id: cred.user.uid});
+      })
+  } catch (error) {
+
+    if (error.code === 'auth/email-already-in-use') {
+      console.log('That email address is already in use!');
+      alert('That email address is already in use! , try login');
+      navigation.navigate("Login");
+    }
+
+    if (error.code === 'auth/invalid-email') {
+      console.log('That email address is invalid!');
+    }
+
+    console.error(error);
+  }
+};
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -116,7 +154,7 @@ const SignUpScreen = ({navigation}) => {
           <Pressable
             style={styles.button}
             onPress={() => {
-              signup(email, password);
+              signup(email, password, firstName, lastName);
               setUserName(firstName,lastName);
             }}>
             <Text style={{color: '#fff', fontWeight: 'bold'}}>Register</Text>

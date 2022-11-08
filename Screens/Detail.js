@@ -1,14 +1,16 @@
 import React,{useState,useEffect} from "react";
-
 import { View, Text, Button } from "react-native";
 import auth from "@react-native-firebase/auth";
 import store from "../Redux/stroe";
 import { Provider,useSelector } from "react-redux";
+
 const DetailScreen = ({ navigation }) => {
+
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
   const firstname = useSelector((store) => store.firstName);
   const lastName = useSelector((store) => store.lastName);
+  
   // Handle user state changes
   function onAuthStateChanged(user) {
     setUser(user);
