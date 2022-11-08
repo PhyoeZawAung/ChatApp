@@ -1,6 +1,6 @@
 import React from "react";
 
-import { View, Text, Pressable ,StyleSheet} from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 
 
 
@@ -11,29 +11,29 @@ const StartScreen = ({ navigation }) => {
         <Text>Logo is here</Text>
       </View>
       <View>
-      <Pressable
-            style={styles.button}
-            onPress={() => {
-              navigation.navigate("Login")
-            }}> 
-            <Text style={{color: '#fff', fontWeight: 'bold'}}>Login with Email</Text>
+        <Pressable
+          style={styles.button}
+          onPress={() => {
+            navigation.navigate("Login")
+          }}>
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>Login with Email</Text>
         </Pressable>
-        <Pressable onPress={()=>{navigation.navigate("Forgot")}}>
+        <Pressable onPress={() => { navigation.navigate("Forgot") }}>
           <Text style={styles.text}>Forgotten Password?</Text>
         </Pressable>
 
       </View>
       <View>
-        <View  style={styles.signup}>
+        <View style={styles.signup}>
           <Text style={styles.text}>New User?  </Text>
           <Pressable onPress={() => { navigation.navigate("SignUp") }}>
             <Text style={styles.signUpText}>Sign Up</Text>
           </Pressable>
         </View>
-        
+
 
       </View>
-      
+
     </View>
   )
 }
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 30,
     justifyContent: "space-between",
-    alignItems:"center",
+    alignItems: "center",
   },
   button: {
     width: 350,
@@ -55,16 +55,16 @@ const styles = StyleSheet.create({
   },
   signup: {
     flexDirection: "row",
-    alignItems:"center",
+    alignItems: "center",
   },
   text: {
     color: "#fff",
-    fontWeight:"bold",
+    fontWeight: "bold",
   },
   signUpText: {
     color: "#46eeaa",
     fontWeight: "bold",
-    fontSize:18
+    fontSize: 18
   }
 })
 export default StartScreen;

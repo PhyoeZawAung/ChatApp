@@ -20,6 +20,7 @@ const SignUpScreen = ({navigation}) => {
         .createUserWithEmailAndPassword(email, password)
         .then(() => {
           console.log('User account created & signed in!');
+          navigation.navigate("Message");
           
           ToastAndroid.showWithGravity(
             "Account Create Successfully",

@@ -12,6 +12,8 @@ import ForgotScreen from "../Forgot";
 import store from "../../Redux/stroe";
 import { Provider } from "react-redux";
 import auth from "@react-native-firebase/auth";
+import MessagesScreen from "../Chat/MessagesScreen";
+import ChatScreen from "../Chat/ChatScreen";
 const Stack = createStackNavigator();
 const StackScreen = () => 
 {
@@ -45,12 +47,12 @@ const StackScreen = () =>
             </Stack.Group>
         ) : (
             <Stack.Group>
-              <Stack.Screen name="Upload" component={ImageUploader}/>
-              <Stack.Screen name="Detail" component={DetailScreen} />
+              <Stack.Screen name="Message" component={MessagesScreen}/>
+              <Stack.Screen name="Chat" component={ChatScreen}/>
+              
+        
             </Stack.Group>
         )}
-
-        
       </Stack.Navigator>
 
       </NavigationContainer>
@@ -59,3 +61,7 @@ const StackScreen = () =>
 }
 
 export default StackScreen;
+/*
+<Stack.Screen name="Upload" component={ImageUploader}/>
+<Stack.Screen name="Detail" component={DetailScreen} />
+*/
