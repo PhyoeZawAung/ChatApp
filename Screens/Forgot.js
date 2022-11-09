@@ -4,7 +4,15 @@ import {View, Text, TextInput, Pressable, StyleSheet} from 'react-native';
 import auth from '@react-native-firebase/auth';
 
 const ForgotScreen = ({navigation}) => {
-  
+  const Forgot = async (email) => {
+    await auth().sendPasswordResetEmail(email)
+      .then(() => {
+       alert("Password Reset mail send , Check In your mail")
+      })
+      .catch(error => {
+        alert(JSON.stringify(error));
+    })
+  }
   const [email, setEmail] = useState('');
   return (
     <View style={styles.container}>
@@ -26,7 +34,7 @@ const ForgotScreen = ({navigation}) => {
           <Pressable
             style={styles.button}
             onPress={() => {
-              signIn(email, password);
+              Forgot(email);
             }}> 
             <Text style={{color: '#fff', fontWeight: 'bold'}}>Send Link</Text>
           </Pressable>

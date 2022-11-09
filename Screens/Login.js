@@ -2,17 +2,20 @@ import React, {useState} from 'react';
 
 import {View, Text, TextInput, Pressable, StyleSheet,ToastAndroid} from 'react-native';
 import auth from '@react-native-firebase/auth';
-
+import { Dialog } from '@rneui/base';
 const LoginScreen = ({navigation}) => {
   const [showhide, setShowHide] = useState(true);
+  const [dialog, setDialog] = useState(false);
+  const [error, setError] = useState("");
   const Show = showhide => {
     if (showhide == true) {
       return false;
     } else return true;
   };
-  const signIn = (email, password) => {
-    if (email != '' && password != '') {
-      auth()
+  const signIn = async (email, password) => { 
+    console.log("Enter Sign process")
+    if (email != "" && password != "") {
+      await auth()
         .signInWithEmailAndPassword(email, password)
         .then(() => {
           console.log('User account created & signed in!');
@@ -27,6 +30,8 @@ const LoginScreen = ({navigation}) => {
     
           if (error.code === 'auth/invalid-email') {
             console.log('That email address is invalid!');
+            setError("That email address is invalid!");
+            toggleDialog();
           }
           if (error.code === "auth/wrong-password") {
             console.log("Wrong password");
@@ -35,13 +40,24 @@ const LoginScreen = ({navigation}) => {
               ToastAndroid.LONG,
               ToastAndroid.BOTTOM,
             )
-         }
-          console.error(error);
+            setError("Wrong password");
+            toggleDialog();
+            
+          }
+          if (error.code === "auth/too-many-requests") {
+            setError("Too many Request wait for a minute and try again");
+            toggleDialog();
+          }
+          console.log(error);
+          
         });
     }
   };
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const toggleDialog = () => {
+    setDialog(!dialog);
+  }
   return (
     <View style={styles.container}>
       <View style={styles.signUpCard}>
@@ -79,10 +95,20 @@ const LoginScreen = ({navigation}) => {
           <Pressable
             style={styles.button}
             onPress={() => {
+              console.log("Press login")
               signIn(email, password);
             }}> 
             <Text style={{color: '#fff', fontWeight: 'bold'}}>Login</Text>
           </Pressable>
+          <Dialog isVisible={dialog} onBackdropPress={() => { toggleDialog() }}
+          overlayStyle={{backgroundColor: '#fff', borderRadius: 10}}>
+            <Dialog.Title title={error} />
+            <Dialog.Button title="Forgot password" onPress={() => {
+              console.log('Primary Action Clicked!')
+              navigation.navigate("Forgot")}} />
+           
+
+          </Dialog>
         </View>
       </View>
     </View>

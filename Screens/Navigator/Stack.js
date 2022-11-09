@@ -15,47 +15,65 @@ import auth from "@react-native-firebase/auth";
 import MessagesScreen from "../Chat/MessagesScreen";
 import ChatScreen from "../Chat/ChatScreen";
 const Stack = createStackNavigator();
-const StackScreen = () => {
 
-  // Set an initializing state whilst Firebase connects
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
+const StackScreen = () => 
+{
 
-  // Handle user state changes
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
-
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
-  }, []);
-
+    // Set an initializing state whilst Firebase connects
+    const [initializing, setInitializing] = useState(true);
+    const [user, setUser] = useState();
+    // Handle user state changes
+    function onAuthStateChanged(user) {
+      setUser(user);
+      if (initializing) setInitializing(false); 
+    }
+  
+    useEffect(() => {
+      const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+      // unsubscribe on unmount
+    });
+  
   if (initializing) return null;
 
   return (
     <Provider store={store}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          {!user ? (<Stack.Group>
-            <Stack.Screen name="Start" component={StartScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="SignUp" component={SignUpScreen} />
-            <Stack.Screen name="Forgot" component={ForgotScreen} />
-          </Stack.Group>
-          ) : (
-            <Stack.Group>
-              <Stack.Screen name="Message" component={MessagesScreen} />
-              <Stack.Screen name="Chat" component={ChatScreen} />
-
-
-
+    <NavigationContainer>
+      <Stack.Navigator>
+        {!user ? (<Stack.Group>
+                <Stack.Screen name="Start" component={StartScreen}/>
+                <Stack.Screen name="Login" component={LoginScreen} />
+                <Stack.Screen name="SignUp" component={SignUpScreen} />
+                <Stack.Screen name="Forgot" component={ForgotScreen} />
+                
             </Stack.Group>
-          )}
-        </Stack.Navigator>
+          ) : (
+              
+              <Stack.Group>
+                {user.displayName == null ? (
+                  <>
+                    <Stack.Screen name="Upload" component={ImageUploader} />
+                    <Stack.Screen name="Detail" component={DetailScreen} />
+                  </>
+                  
+                ) : (
+                    <>
+                       <Stack.Screen name="Detail" component={DetailScreen} />
+                    </>
+                 
+                )}
+              
+              
+              
+            </Stack.Group>
+        )}
 
-      </NavigationContainer>
+
+
+            
+        
+      </Stack.Navigator>
+
+    </NavigationContainer>
     </Provider>
   )
 }

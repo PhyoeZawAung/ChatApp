@@ -1,17 +1,28 @@
 import React, {useState} from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { SetUser } from '../Redux/User/UserAction';
-import {View, Text, TextInput, Pressable, StyleSheet,ToastAndroid} from 'react-native';
+import {useSelector, useDispatch, Provider} from 'react-redux';
+import {SetUser} from '../Redux/User/UserAction';
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  ToastAndroid,
+} from 'react-native';
 import auth from '@react-native-firebase/auth';
+import {Formik} from 'formik';
+import * as yup from 'yup';
 import firestore from "@react-native-firebase/firestore";
 
 const SignUpScreen = ({navigation}) => {
 
   const [showhide, setShowHide] = useState(true);
   const dispatch = useDispatch();
-  const setUserName = (firstName,lastName) => {
-    dispatch(SetUser({ firstName: firstName, lastName: lastName }));
-  }
+  const setUserName = (firstName, lastName) => {
+    dispatch(
+      SetUser({firstName: firstName, lastName: lastName, nameAdded: true}),
+    );
+  };
   const Show = showhide => {
     if (showhide == true) {
       return false;
@@ -26,14 +37,12 @@ const SignUpScreen = ({navigation}) => {
         .then(() => {
           console.log('User account created & signed in!');
           //navigation.navigate("Message");
-          
+
           ToastAndroid.showWithGravity(
-            "Account Create Successfully",
+            'Account Create Successfully',
             ToastAndroid.SHORT,
             ToastAndroid.BOTTOM,
-          )
-          
-      
+          );
         })
         .catch(error => {
           if (error.code === 'auth/email-already-in-use') {
@@ -46,15 +55,11 @@ const SignUpScreen = ({navigation}) => {
 
           console.error(error);
         });
-        
-        
-     
     }
   };
 */
 
 const signup = async (email, password, firstName, lastName) => {
-
   try {
     await auth()
       .createUserWithEmailAndPassword(email, password)
@@ -68,7 +73,6 @@ const signup = async (email, password, firstName, lastName) => {
             email,
             password,
           })
-        navigation.navigate("Upload", {id: cred.user.uid});
       })
   } catch (error) {
 
@@ -86,80 +90,134 @@ const signup = async (email, password, firstName, lastName) => {
   }
 };
 
+/*
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-
+*/
   return (
     <View style={styles.container}>
       <View style={styles.signUpCard}>
         <Text style={styles.header}>Register</Text>
         <Text style={styles.text}>Please Sign Up Your Account</Text>
 
-        <View style={styles.InputBox}>
-          <View style={styles.name}>
-            <TextInput
-              style={styles.nameInput}
-              placeholder="first name"
-              onChangeText={(text) => { setFirstName(text) }}></TextInput>
-            <TextInput
-              style={styles.nameInput}
-              placeholder="last name"
-            onChangeText={(text) =>{setLastName(text)}}></TextInput>
-          </View>
-          <TextInput
-            placeholder="example@gmail.com"
-            style={styles.gmailInput}
-            onChangeText={text => setEmail(text)}
-          />
+        <Formik
+          initialValues={{
+            firstName: '',
+            lastName: '',
+            mail: '',
+            password: '',
+            retypePassword: '',
+          }}
+          validationSchema={yup.object({
+            firstName: yup.string().required('Enter First Name'),
+            mail: yup.string().email('Invalid Email').required('Enter Email'),
+            password: yup
+              .string()
+              .min(8, ({min}) => `password must be ${min} characters`)
+              .matches(/[0-9]/, 'Must Contain number(0 to 9)')
 
-          <View style={styles.passwordInput}>
-            <TextInput
-              placeholder="Password"
-              style={styles.inputField}
-              onChangeText={text => {
-                setPassword(text);
-              }}
-              secureTextEntry={showhide}
-            />
-            <Pressable
-              onPress={() => {
-                setShowHide(Show(showhide));
-              }}>
-              <Text style={styles.showhidebutton}>
-                {showhide ? 'Show' : 'Hide'}
-              </Text>
-            </Pressable>
-          </View>
+              .required('Enter Password'),
+            retypePassword: yup
+              .string()
 
-          <View style={styles.passwordInput}>
-            <TextInput
-              placeholder="Comfirm Password"
-              style={styles.inputField}
-              onChangeText={text => {
-                setPassword(text);
-              }}
-              secureTextEntry={showhide}
-            />
-            <Pressable
-              onPress={() => {
-                setShowHide(Show(showhide));
-              }}>
-              <Text style={styles.showhidebutton}>
-                {showhide ? 'Show' : 'Hide'}
-              </Text>
-            </Pressable>
-          </View>
-          <Pressable
-            style={styles.button}
-            onPress={() => {
-              signup(email, password, firstName, lastName);
-              setUserName(firstName,lastName);
-            }}>
-            <Text style={{color: '#fff', fontWeight: 'bold'}}>Register</Text>
-          </Pressable>
-        </View>
+              .oneOf([yup.ref('password'), null], "Password doesn't match")
+              .required('Enter Password'),
+          })}
+          onSubmit={ (values, formikAction) => {
+              setTimeout( () => {
+                console.log(JSON.stringify(values));
+                setUserName(values.firstName, values.lastName);
+                signup(values.mail, values.password, values.firstName, values.lastName);
+                formikAction.setSubmitting(false);
+              }, 500);  
+          }}>
+          {props => (
+            <View style={styles.InputBox}>
+              <View style={styles.name}>
+                <TextInput
+                  style={styles.nameInput}
+                  placeholder="first name"
+                  onChangeText={props.handleChange('firstName')}
+                  onBlur={props.handleBlur('firstName')}
+                  value={props.values.firstName}></TextInput>
+                <TextInput
+                  style={styles.nameInput}
+                  placeholder="last name"
+                  onChangeText={props.handleChange('lastName')}
+                  onBlur={props.handleBlur('last Name')}
+                  value={props.values.lastName}></TextInput>
+              </View>
+              {props.touched.firstName && props.errors.firstName ? (
+                <Text style={styles.error}>{props.errors.firstName}</Text>
+              ) : null}
+              <TextInput
+                placeholder="example@gmail.com"
+                style={styles.gmailInput}
+                onChangeText={props.handleChange('mail')}
+                onBlur={props.handleBlur('mail')}
+                value={props.values.mail}
+              />
+              {props.touched.mail && props.errors.mail ? (
+                <Text style={styles.error}>{props.errors.mail}</Text>
+              ) : null}
+              <View style={styles.passwordInput}>
+                <TextInput
+                  placeholder="Password"
+                  style={styles.inputField}
+                  onChangeText={props.handleChange('password')}
+                  onBlur={props.handleBlur('password')}
+                  value={props.values.password}
+                  secureTextEntry={showhide}
+                />
+                <Pressable
+                  onPress={() => {
+                    setShowHide(Show(showhide));
+                  }}>
+                  <Text style={styles.showhidebutton}>
+                    {showhide ? 'Show' : 'Hide'}
+                  </Text>
+                </Pressable>
+              </View>
+              {props.touched.password && props.errors.password ? (
+                <Text style={styles.error}>{props.errors.password}</Text>
+              ) : null}
+
+              <View style={styles.passwordInput}>
+                <TextInput
+                  placeholder="Comfirm Password"
+                  style={styles.inputField}
+                  onChangeText={props.handleChange('retypePassword')}
+                  onBlur={props.handleBlur('retypePassword')}
+                  value={props.values.retypePassword}
+                  secureTextEntry={showhide}
+                />
+                <Pressable
+                  onPress={() => {
+                    setShowHide(Show(showhide));
+                  }}>
+                  <Text style={styles.showhidebutton}>
+                    {showhide ? 'Show' : 'Hide'}
+                  </Text>
+                </Pressable>
+              </View>
+              {props.touched.retypePassword && props.errors.retypePassword ? (
+                <Text style={styles.error}>{props.errors.retypePassword}</Text>
+              ) : null}
+              <Pressable
+                style={styles.button}
+                onPress={() => {
+                  console.log('press');
+                  props.handleSubmit();
+                }}>
+                <Text style={{color: '#fff', fontWeight: 'bold'}}>
+                  Register
+                </Text>
+              </Pressable>
+            </View>
+          )}
+        </Formik>
       </View>
     </View>
   );
@@ -224,6 +282,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 20,
     padding: 16,
+  },
+  error: {
+    color: '#f00',
+    fontSize: 12,
   },
 });
 export default SignUpScreen;
