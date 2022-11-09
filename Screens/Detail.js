@@ -14,7 +14,7 @@ const DetailScreen = ({ navigation }) => {
   useEffect(() => {
     const user = auth().currentUser;
     setUser(user)
-  },[2])
+  },[])
   
 
   const SignOut = () => {
