@@ -44,14 +44,14 @@ const MeScreen = () => {
   const getImageFromCamera = async () => {
     const result = await launchCamera();
     console.log(result);
-    setImage(result);
-    console.log('image Url:::' + image);
+    setUpdateUserPhoto(result);
+    console.log('image Url:::' + updateUserPhoto);
   };
   const selectImage = async () => {
     const result = await launchImageLibrary();
     console.log(result);
-    setImage(result);
-    console.log('Image Url:::' + image);
+    setUpdateUserPhoto(result);
+    console.log('Image Url:::' + updateUserPhoto);
   };
   const toggleEdit = () => {
     setEdit(!edit)
