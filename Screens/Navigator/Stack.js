@@ -14,6 +14,7 @@ import { Provider } from "react-redux";
 import auth from "@react-native-firebase/auth";
 import MessagesScreen from "../Chat/MessagesScreen";
 import ChatScreen from "../Chat/ChatScreen";
+import MeScreen from "../Me";
 const Stack = createStackNavigator();
 
 const StackScreen = () => 
@@ -52,12 +53,18 @@ const StackScreen = () =>
                 {user.displayName == null ? (
                   <>
                     <Stack.Screen name="Upload" component={ImageUploader} />
-                    <Stack.Screen name="Detail" component={DetailScreen} />
+                    {/*<Stack.Screen name="Detail" component={DetailScreen} />*/}
+                    {/*<Stack.Screen name="Detail" component={DetailScreen} />*/}
+                    <Stack.Screen name="Chat" component={ChatScreen} />
+                    <Stack.Screen name ="Me" component={MeScreen}/>
                   </>
                   
                 ) : (
                     <>
-                       <Stack.Screen name="Detail" component={DetailScreen} />
+                       {/*<Stack.Screen name="Detail" component={DetailScreen} />*/}
+                      {/*<Stack.Screen name="Detail" component={DetailScreen} />*/}
+                      <Stack.Screen name="Chat" component={ChatScreen} />
+                      <Stack.Screen name ="Me" component={MeScreen}/>
                     </>
                  
                 )}

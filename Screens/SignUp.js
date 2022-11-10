@@ -22,6 +22,7 @@ const SignUpScreen = ({navigation}) => {
     dispatch(
       SetUser({firstName: firstName, lastName: lastName, nameAdded: true}),
     );
+    console.log("user name" + firstName + lastName);
   };
   const Show = showhide => {
     if (showhide == true) {

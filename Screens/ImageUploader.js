@@ -143,7 +143,9 @@ const ImageUploader = ({navigation}) => {
     setLoad(true);
     const user = auth().currentUser;
     const name = firstName + ' ' + lastName;
-    imageUrl = photoURL.assets[0].uri;
+    if (photoURL != null) {
+   
+    const imageUrl = photoURL.assets[0].uri;
     // path to existing file on filesystem
 
     const refUrl = 'images/' + auth().currentUser.uid + '_profile_photo.jpg';
@@ -171,13 +173,24 @@ const ImageUploader = ({navigation}) => {
       console.log('Add Profile Photo');
       console.log('Profile set');
       setLoadingText('Profile set');
+      console.log("Name::::" + name)
       await user.updateProfile({displayName: name});
       console.log('Profile name set');
       setLoadingText('Profile name set');
       setLoadingText('Done');
-      navigation.dispatch(StackActions.replace('Detail'));
+      navigation.dispatch(StackActions.replace('Chat'));
       setLoad(false);
     });
+    }
+    else {
+      await user.updateProfile({displayName: name});
+      console.log('Profile name set');
+      setLoadingText('Profile name set');
+      setLoadingText('Done');
+      navigation.dispatch(StackActions.replace('Chat'));
+      setLoad(false);
+    }
+    
   };
   return (
     <View style={styles.container}>
@@ -273,7 +286,8 @@ const ImageUploader = ({navigation}) => {
       </View>
     </View>
   );
-}
+};
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#9b5de0',
