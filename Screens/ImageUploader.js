@@ -206,7 +206,7 @@ const ImageUploader = ({navigation}) => {
       setLoadingText('Profile name set');
       setLoadingText('Done');
 
-      navigation.dispatch(StackActions.replace('Messages'));
+      navigation.dispatch(StackActions.replace('Home'));
 
       setLoad(false);
     });
@@ -216,7 +216,7 @@ const ImageUploader = ({navigation}) => {
       console.log('Profile name set');
       setLoadingText('Profile name set');
       setLoadingText('Done');
-      navigation.dispatch(StackActions.replace('Messages'));
+      navigation.dispatch(StackActions.replace('Home'));
       setLoad(false);
     }
     

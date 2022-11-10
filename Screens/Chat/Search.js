@@ -1,9 +1,18 @@
 import React, {Component} from 'react';
-import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
-import {firebase} from '@react-native-firebase/auth';
-class MessagesScreen extends Component {
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Button,
+  Alert,
+  TextInput,
+} from 'react-native';
+import firestore, {firebase} from '@react-native-firebase/firestore';
+
+class SearchScreen extends Component {
   state = {
     users: [],
+    text: '',
   };
   constructor(props) {
     super(props);
@@ -11,9 +20,10 @@ class MessagesScreen extends Component {
     //this.state = {text: ' '};
     this.subscriber = firebase
       .firestore()
-      .collection('users')
+      .collection('THREADS')
       //.where('name', '==', this.state.text)
       .onSnapshot(docs => {
+        console.log(this.state.text);
         let users = [];
         docs.forEach(doc => {
           users.push(doc.data());
@@ -22,27 +32,52 @@ class MessagesScreen extends Component {
         console.log(users);
       });
   }
+  /*.get()
+      .then(querySnapshot => {
+         console.log('Total users: ', querySnapshot.size);
+
+        querySnapshot.forEach(documentSnapshot => {
+          console.log(
+            'User ID: ',
+            documentSnapshot.id,
+            documentSnapshot.data(),
+          );
+        }
+        );
+      });
+  }
+  getUser = async () => {
+    const userDocument = await firebase
+      .firestore()
+      .collection('THREADS')
+      .doc('ABC')
+      .get();
+    console.log(userDocument);
+  };*/
+
   render() {
-    const {navigation} = this.props;
     return (
-      <ScrollView style={{backgroundColor: '#4F3B70'}}>
-        <View style={{padding: 20}}>
-          <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold'}}>
-            Messages
-          </Text>
+      <View
+        style={{backgroundColor: '#4F3B70', flex: 1, paddingHorizontal: 20}}>
+        <View style={{marginTop: 20}}>
+          <TextInput
+            placeholder="yogurt"
+            value={this.state.text}
+            onChangeText={text => this.setState({text})}
+            style={{borderRadius: 20}}
+          />
+          <Button title="search" onPress={this.subscriber} />
         </View>
-        <View
-          style={{
-            backgroundColor: '#ffffff',
-            borderTopRightRadius: 40,
-            borderTopLeftRadius: 40,
-          }}>
+        <View>
           {this.state.users.map((user, index) => (
-            <View key={index} style={{marginTop: 20}}>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate('Chat');
-                }}>
+            <View
+              key={index}
+              style={{
+                backgroundColor: '#ffffff',
+                borderRadius: 20,
+                marginTop: 27,
+              }}>
+              <TouchableOpacity>
                 <View
                   style={{
                     flexDirection: 'row',
@@ -61,11 +96,10 @@ class MessagesScreen extends Component {
                         color: '#000000',
                         marginBottom: 5,
                       }}>
-                      {user.firstName}
-                      {user.lastName}
+                      {user.name}
                     </Text>
                     <Text style={{fontSize: 16, color: '#000000'}}>
-                      {user.email}
+                      {user.age}
                     </Text>
                   </View>
                   <Text
@@ -83,9 +117,9 @@ class MessagesScreen extends Component {
             </View>
           ))}
         </View>
-      </ScrollView>
+      </View>
     );
   }
 }
 
-export default MessagesScreen;
+export default SearchScreen;

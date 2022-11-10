@@ -1,108 +1,108 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {View, ScrollView, Text, Button, StyleSheet} from 'react-native';
-import {Bubble, GiftedChat, Send} from 'react-native-gifted-chat';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import React, {useLayoutEffect, useCallback, useEffect, useState} from 'react';
+import {View, Text, Button} from 'react-native';
+import {GiftedChat} from 'react-native-gifted-chat';
+import {firebase} from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import {launchImageLibrary} from 'react-native-image-picker';
 
-const ChatScreen = () => {
-  const [messages, setMessages] = useState([]);
-
+function ChatScreen({navigation}) {
   useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        text: 'Hello developer',
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any',
-        },
-      },
-      {
-        _id: 2,
-        text: 'Hello world',
-        createdAt: new Date(),
-        user: {
-          _id: 1,
-          name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any',
-        },
-      },
-    ]);
+    navigation.setOptions({
+      headerRight: () => (
+        <Button
+          onPress={() => {
+            selectImage();
+          }}
+          title="Image"
+          color="#000000"
+        />
+      ),
+    });
+  });
+  const [image, setImage] = useState();
+  const selectImage = async () => {
+    const result = await launchImageLibrary();
+    console.log(result);
+    setImage(result);
+    console.log('Image Url:::' + image);
+  };
+  const user = firebase.auth().currentUser;
+  if (user !== null) {
+    const uid = user.id;
+  }
+  const [messages, setMessages] = useState([]);
+  // useEffect(() => {
+  //   setMessages([
+  //     {
+  //       _id: 1,
+  //       text: 'Hello developer',
+  //       createdAt: new Date(),
+  //       user: {
+  //         _id: 2,
+  //         name: 'React Native',
+  //         avatar: 'https://placeimg.com/140/140/any',
+  //       },
+  //       image: 'https://facebook.github.io/react/img/logo_og.png',
+  //     },
+  //   ]);
+  // }, []);
+  useLayoutEffect(() => {
+    const Unsubscribe = firebase
+      .firestore()
+      .collection('messages')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(snapshot =>
+        setMessages(
+          snapshot.docs.map(doc => ({
+            _id: doc.data()._id,
+            createdAt: doc.data().createdAt.toDate(),
+            text: doc.data().text,
+            user: doc.data().user,
+            image: doc.data().image,
+          })),
+        ),
+      );
+    return Unsubscribe;
   }, []);
 
   const onSend = useCallback((messages = []) => {
-    setMessages((previousMessages) =>
+    setMessages(previousMessages =>
       GiftedChat.append(previousMessages, messages),
     );
+    const {_id, createdAt, text, user} = messages[0];
+    firebase
+      .firestore()
+      .collection('messages')
+      .add({
+        _id,
+        createdAt,
+        text,
+        user,
+      })
+      .then(() => {
+        console.log('User added!');
+      });
   }, []);
 
-  const renderSend = (props) => {
-    return (
-      <Send {...props}>
-        <View>
-          <FontAwesome 
-            name='send' 
-            size={30} 
-            color='#333'
-            style={{marginRight: 15}} />
-        </View>
-      </Send>
-    );
-  };
-
-  const renderBubble = (props) => {
-    return (
-      <Bubble
-        {...props}
-        wrapperStyle={{
-          right: {
-            backgroundColor: '#2e64e5',
-          },
-        }}
-        textStyle={{
-          right: {
-            color: '#fff',
-          },
-        }}
-      />
-    );
-  };
-
-  const scrollToBottomComponent = () => {
-    return(
-      <FontAwesome 
-        name='angle-double-down' 
-        size={22} 
-        color='#333'
-        style={{marginRight: 10}} 
-      />
-    );
-  }
-
+  // useLayoutEffect(() => {
+  //   navigation.setOptions({
+  //     headerleft: () => {
+  //       <View style={{marginLeft: 20}}>
+  //         <Text>User's Profile</Text>
+  //         <Text>User's name</Text>
+  //       </View>;
+  //     },
+  //   });
+  // });
   return (
     <GiftedChat
       messages={messages}
-      onSend={(messages) => onSend(messages)}
+      showAvatarForEveryMessage={true}
+      onSend={messages => onSend(messages)}
       user={{
-        _id: 1,
+        _id: auth().currentUser.email,
       }}
-      renderBubble={renderBubble}
-      alwaysShowSend
-      renderSend={renderSend}
-      scrollToBottom
-      scrollToBottomComponent={scrollToBottomComponent}
     />
   );
-};
-
+}
 export default ChatScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
