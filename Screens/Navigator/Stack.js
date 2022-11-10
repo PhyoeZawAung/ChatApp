@@ -40,7 +40,7 @@ const StackScreen = () => {
       <NavigationContainer>
         {!user ? (
           <Stack.Navigator>
-            <Stack.Group>
+            <Stack.Group screenOptions={{headerShown:false}}>
               <Stack.Screen name="Start" component={StartScreen} />
               <Stack.Screen name="Login" component={LoginScreen} />
               <Stack.Screen name="SignUp" component={SignUpScreen} />
