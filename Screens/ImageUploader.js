@@ -110,6 +110,8 @@ import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
 import {useSelector} from 'react-redux';
 import {StackActions} from '@react-navigation/native';
+import firestore from "@react-native-firebase/firestore";
+
 const ImageUploader = ({navigation}) => {
   const [choice, setChoice] = useState(false);
   const firstName = useSelector(store => store.firstName);
@@ -148,6 +150,7 @@ const ImageUploader = ({navigation}) => {
 
     const refUrl = 'images/' + auth().currentUser.uid + '_profile_photo.jpg';
     const reference = await storage().ref(refUrl);
+
     const pathToFile = imageUrl;
     // uploads file
     const task = reference.putFile(pathToFile);
@@ -162,20 +165,47 @@ const ImageUploader = ({navigation}) => {
     });
 
     task.then(async () => {
+
       console.log('Image uploaded to the bucket!');
       console.log('Imgae Uploaded');
+
       setLoadingText('Imgae Uploaded');
-      const url = await storage().ref(refUrl).getDownloadURL();
+
+       const url = await storage().ref(refUrl).getDownloadURL();
+
+       /*
+       try {
+        await storage().ref(refUrl).getDownloadURL().then( (url) => {
+          firestore()
+            .collection("users")
+            .doc(user.uid)
+            .set({
+              url
+            })
+        });
+       } catch(error){
+        console.log(error);
+       }
+       */
       console.log('Get download url' + JSON.stringify(url));
+      console.log(reference);
+
       await auth().currentUser.updateProfile({photoURL: url});
+
       console.log('Add Profile Photo');
       console.log('Profile set');
+
       setLoadingText('Profile set');
+
       await user.updateProfile({displayName: name});
+
       console.log('Profile name set');
+
       setLoadingText('Profile name set');
       setLoadingText('Done');
-      navigation.dispatch(StackActions.replace('Detail'));
+
+      navigation.dispatch(StackActions.replace('Messages'));
+
       setLoad(false);
     });
   };

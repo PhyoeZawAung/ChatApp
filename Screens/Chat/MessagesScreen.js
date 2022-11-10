@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, Button } from 'react-native';
 import {
   Container,
   Card,
@@ -12,6 +12,7 @@ import {
   MessageText,
   TextSection,
 } from './MessageStyles';
+import auth from "@react-native-firebase/auth";
 
 const Messages = [
   {
@@ -56,6 +57,10 @@ const Messages = [
   },
 ];
 
+const SignOut = () => {
+  auth().signOut().then(() => { console.log("Sign out"); }).catch(error=>console.error(error))
+} 
+
 const MessagesScreen = ({navigation}) => {
     return (
       <Container>
@@ -79,6 +84,8 @@ const MessagesScreen = ({navigation}) => {
             </Card>
           )}
         />
+
+        <Button title="signOut" onPress={() => SignOut()} />
       </Container>
     );
 };

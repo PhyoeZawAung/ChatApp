@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
-
 import {View, Text, TextInput, Pressable, StyleSheet,ToastAndroid} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { Dialog } from '@rneui/base';
+
+
 const LoginScreen = ({navigation}) => {
   const [showhide, setShowHide] = useState(true);
   const [dialog, setDialog] = useState(false);
@@ -20,8 +21,8 @@ const LoginScreen = ({navigation}) => {
         .then(() => {
           console.log('User account created & signed in!');
           //alert('signed in!');
-          //navigation.navigate("Message");
-         
+          
+          
         })
         .catch(error => {
           if (error.code === 'auth/email-already-in-use') {
@@ -97,6 +98,7 @@ const LoginScreen = ({navigation}) => {
             onPress={() => {
               console.log("Press login")
               signIn(email, password);
+              //navigation.navigate("Messages");
             }}> 
             <Text style={{color: '#fff', fontWeight: 'bold'}}>Login</Text>
           </Pressable>

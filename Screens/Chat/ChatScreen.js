@@ -43,7 +43,7 @@ const ChatScreen = () => {
       <Send {...props}>
         <View>
           <FontAwesome 
-            name='fa-paper-plane' 
+            name='send' 
             size={30} 
             color='#333'
             style={{marginRight: 15}} />

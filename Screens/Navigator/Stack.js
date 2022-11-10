@@ -52,12 +52,14 @@ const StackScreen = () =>
                 {user.displayName == null ? (
                   <>
                     <Stack.Screen name="Upload" component={ImageUploader} />
-                    <Stack.Screen name="Detail" component={DetailScreen} />
+                    <Stack.Screen name="Messages" component={MessagesScreen} />
+                    <Stack.Screen name="Chat" component={ChatScreen}/>
                   </>
                   
                 ) : (
                     <>
-                       <Stack.Screen name="Detail" component={DetailScreen} />
+                       <Stack.Screen name="Messages" component={MessagesScreen} />
+                       <Stack.Screen name="Chat" component={ChatScreen}/>
                     </>
                  
                 )}

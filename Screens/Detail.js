@@ -21,7 +21,7 @@ const DetailScreen = ({ navigation }) => {
 
   const SignOut = () => {
     auth().signOut().then(() => { console.log("Sign out"); }).catch(error=>console.error(error))
-} 
+  } 
 
   return (
     <Provider store={store}>
