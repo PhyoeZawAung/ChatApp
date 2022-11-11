@@ -1,7 +1,7 @@
 import {createStackNavigator} from '@react-navigation/stack';
 import {TouchableOpacity} from 'react-native';
 import MessagesScreen from '../Chat/MessagesScreen';
-import ChatScreen from '../Chat/ChatScreen';
+import ChatScreen from '../Chat/Chat';
 import SearchScreen from '../Chat/Search';
 import Icon from 'react-native-vector-icons/FontAwesome';
 

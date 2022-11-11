@@ -5,25 +5,53 @@ class MessagesScreen extends Component {
   state = {
     users: [],
   };
+  handlechat = userId => {
+    firebase
+      .firestore()
+      .collection('chatroom')
+      .add({
+        userId,
+      })
+      .then(() => {
+        this.props.navigation.navigate('Chat', {userId});
+        console.log({userId});
+        console.log('Chat Room Created');
+      });
+  };
   constructor(props) {
     super(props);
     //this.getUser();
     //this.state = {text: ' '};
-    this.subscriber = firebase
+
+    // this.subscriber = firebase
+    //   .firestore()
+    //   .collection('users')
+    //   .onSnapshot(docs => {
+    //     let users = [];
+    //     docs.forEach(doc => {
+    //       users.push(doc.data());
+    //     });
+    //     this.setState({users});
+    //     console.log(users);
+    //   });
+
+    this.userId = firebase
       .firestore()
       .collection('users')
-      //.where('name', '==', this.state.text)
-      .onSnapshot(docs => {
+      .get()
+      .then(querySnapshot => {
         let users = [];
-        docs.forEach(doc => {
-          users.push(doc.data());
+        querySnapshot.forEach(documentSnapshot => {
+          let user = documentSnapshot.data();
+          user.id = documentSnapshot.id;
+          users.push(user);
+          console.log('User data: ', users);
         });
-        this.setState({users});
-        console.log(users);
+        this.setState({users: users});
       });
   }
   render() {
-    const {navigation} = this.props;
+    const {linkTo} = this.props;
     return (
       <ScrollView style={{backgroundColor: '#4F3B70'}}>
         <View style={{padding: 20}}>
@@ -41,7 +69,7 @@ class MessagesScreen extends Component {
             <View key={index} style={{marginTop: 20}}>
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate('Chat');
+                  this.handlechat({user});
                 }}>
                 <View
                   style={{
@@ -51,7 +79,10 @@ class MessagesScreen extends Component {
                     alignItems: 'center',
                   }}>
                   <View style={{marginRight: 40}}>
-                    <Text>Image</Text>
+                    <Image
+                      source={{uri: user?.photoURL}}
+                      style={{width: 50, height: 50, borderRadius: 100}}
+                    />
                   </View>
                   <View style={{flexDirection: 'column'}}>
                     <Text
