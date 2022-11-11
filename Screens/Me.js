@@ -6,13 +6,15 @@ import auth from '@react-native-firebase/auth';
 import {Avatar, Dialog, Button, Icon} from '@rneui/base';
 import {TextInput} from 'react-native-gesture-handler';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-
+import storage from "@react-native-firebase/storage";
+import { createIconSetFromFontello } from 'react-native-vector-icons';
+import { TestScheduler } from 'jest';
 const MeScreen = () => {
   const [userPhoto, setUserPhoto] = useState();
   const [userName, setUserName] = useState();
   const [userEmail, setUserEmail] = useState();
   const [userPhone, setUserPhone] = useState();
-
+  const [uid , setUid] = useState();
   const [updateUserName, setUpdateUserName] = useState();
   const [updateUserEmail, setUpdateUserEmail] = useState();
   const [updateUserPhoto, setUpdateUserPhoto] = useState();
@@ -22,14 +24,15 @@ const MeScreen = () => {
   const [editMail, setEditMail] = useState(false);
   const [editPhone, setEditPhone] = useState(false);
   const [choice, setChoice] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const user = auth().currentUser;
     if (user !== null) {
       setUserPhoto(user.photoURL);
       setUserName(user.displayName);
       setUserEmail(user.email);
-      setUserPhone(user.phoneNumber);
+      setUserPhone(user.phoneNumber); 
+      setUid(user.uid);
     }
   }, []);
   const toggleChoice = () => {
@@ -43,13 +46,15 @@ const MeScreen = () => {
   const getImageFromCamera = async () => {
     const result = await launchCamera();
     console.log(result);
-    setUserPhoto(result.assets[0].uri);
+    setUpdateUserPhoto(result.assets[0].uri)
+    setUserPhoto(updateUserPhoto);
     console.log('image Url:::' + userPhoto);
   };
   const selectImage = async () => {
     const result = await launchImageLibrary();
     console.log(result);
-    setUserPhoto(result.assets[0].uri);
+    setUpdateUserPhoto(result.assets[0].uri)
+    setUserPhoto(updateUserPhoto);
     console.log('Image Url:::' + userPhoto);
   };
   const toggleEdit = () => {
@@ -63,22 +68,59 @@ const MeScreen = () => {
   };
   //this function update the name of user
 
-  const UpdateName = async name => {
-    //await auth().currentUser.updateProfile({ displayName: name })
+  const UpdateName = async (name) => {
+    await auth().currentUser.updateProfile({ displayName: name })
+    
     console.log('Name Updated');
   };
-  const UpdateEmail = async Email => {
-    //await auth.currentUser.UpdateEmail(Email)
-    console.log('Email Updated');
+  const UpdateEmail = async (Email) => {
+    await auth().currentUser.updateEmail(Email).then(() => {
+      console.log('Email Updated');
+    }).catch(error => console.log(error));
+   
+    
   };
   const UpdatePassword = async Password => {
     //await auth().currentUser.updatePassword(Password)
     console.log('Password Updated');
   };
-  const UpdatePhoneNumber = async PhoneNumber => {
-    //await auth.currentUser.UpdatePhoneNumber(PhoneNumber)
-    console.log('Phone Number Updated');
-  };
+  //const UpdatePhoneNumber = async(PhoneNumber) => {
+  //  await auth().currentUser.updatePhoneNumber(PhoneNumber)
+  //    .then(() => {
+  //      console.log('Phone Number Updated');
+  //    }).catch(error => console.log(error))
+  //  
+  //  
+  //};
+  const UpdatePhoto = async (photo) => {
+    setLoading(true);
+    console.log("Update Photo");
+    const imageUrl = photo;
+     // path to existing file on filesystem
+ 
+     const refUrl = 'images/' + auth().currentUser.uid + '_profile_photo.jpg';
+     const reference = await storage().ref(refUrl);
+     const pathToFile = imageUrl;
+     // uploads file
+     const task = reference.putFile(pathToFile);
+ 
+     task.on('state_changed', taskSnapshot => {
+       console.log(
+         `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
+       );
+      // setLoadingText(
+      //   `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
+      // );
+     });
+    task.then(async() => {
+      console.log("Image Uploaded");
+      const url = await storage().ref(refUrl).getDownloadURL();
+      console.log('Get download url' + JSON.stringify(url));
+      await auth().currentUser.updateProfile({photoURL: url});
+      console.log('Add Profile Photo');
+      setLoading(false);
+    })
+  }
   const SignOut = () => {
     auth()
       .signOut()
@@ -87,7 +129,31 @@ const MeScreen = () => {
       })
       .catch(error => console.error(error));
   };
-
+  const SettingProfile = async (name, email, phone, photo,updateName,updateEmail,updatePhone,updatePhoto) => {
+   
+    if (name != null && updateName != null) {
+      if (name != "") {
+        UpdateName(name)
+      }
+      
+    }
+    if (email != null && updateEmail != null) {
+      if (email != "") {
+        UpdateEmail(email)
+      }
+      
+    }
+    //if (phone != null && updatePhone != null) {
+    //  if (phone != "") {
+    //    UpdatePhoneNumber(phone)
+    //  }
+    // 
+    //}
+    if (photo != null && updatePhoto != null) {
+      UpdatePhoto(photo)
+    }
+    
+  }
   return (
     <View style={styles.container}>
       {userPhoto != null ? (
@@ -120,6 +186,7 @@ const MeScreen = () => {
             }}></Avatar.Accessory>
         </Avatar>
       )}
+      <Text style={{color:"#fff",paddingVertical:20}}>{uid}</Text>
       <Dialog
         isVisible={choice}
         onBackdropPress={toggleChoice}
@@ -154,6 +221,10 @@ const MeScreen = () => {
           }}>
           <Text style={{color: '#fff', fontWeight: 'bold'}}>Cancel</Text>
         </Pressable>
+      </Dialog>
+      <Dialog isVisible={loading} overlayStyle={{backgroundColor:"#fff"}}>
+        <Dialog.Title title="Saving.."/>
+        <Dialog.Loading></Dialog.Loading>
       </Dialog>
 
       <View style={styles.EditView}>
@@ -198,7 +269,7 @@ const MeScreen = () => {
           {!editMail ? <Text>Edit</Text> : <Text>Done</Text>}
         </Pressable>
       </View>
-      <View style={styles.EditView}>
+      {/*<View style={styles.EditView}>
         {editPhone ? (
           <TextInput
             style={{
@@ -211,7 +282,7 @@ const MeScreen = () => {
         ) : (
           <View style={{flexDirection: 'row'}}>
             <Icon name="phone" color={'#fff'} />
-            <Text style={{color: '#fff', paddingLeft: 10}}>{userPhone}</Text>
+              <Text style={{ color: '#fff', paddingLeft: 10 }}>{userPhone}</Text>
           </View>
         )}
         <Pressable
@@ -221,18 +292,24 @@ const MeScreen = () => {
           }}>
           {!editPhone ? <Text>Edit</Text> : <Text>Done</Text>}
         </Pressable>
-      </View>
+      </View>*/}
 
       
-      <Button
-       title="save"
-      />
-      <Button
-        title="Sign out"
-        onPress={() => {
-          SignOut();
-        }}
-      />
+      <Pressable style={styles.button}
+       onPress={() => {
+        SettingProfile(userName, userEmail, userPhone,userPhoto,updateUserName,updateUserEmail,updateUserPhone,updateUserPhoto );
+      }}>
+        <Text style={{color:"#fff",fontWeight:'bold'}}>Save</Text>
+      </Pressable>
+    
+      <Pressable style={styles.button}
+       onPress={() => {
+        SignOut();
+      }}>
+        <Text style={{color:"#fff",fontWeight:'bold'}}>SignOut</Text>
+       </Pressable>
+     
+      
     </View>
   );
 };
@@ -249,8 +326,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-
-    height: 50,
+    marginBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor:"#aeaeae",
+    height: 60,
   },
   button: {
     width: '100%',

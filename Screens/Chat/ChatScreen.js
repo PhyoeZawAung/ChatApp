@@ -6,26 +6,26 @@ import auth from '@react-native-firebase/auth';
 import {launchImageLibrary} from 'react-native-image-picker';
 
 function ChatScreen({navigation}) {
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Button
-          onPress={() => {
-            selectImage();
-          }}
-          title="Image"
-          color="#000000"
-        />
-      ),
-    });
-  });
-  const [image, setImage] = useState();
-  const selectImage = async () => {
-    const result = await launchImageLibrary();
-    console.log(result);
-    setImage(result);
-    console.log('Image Url:::' + image);
-  };
+  // useEffect(() => {
+  //   navigation.setOptions({
+  //     headerRight: () => (
+  //       <Button
+  //         onPress={() => {
+  //           selectImage();
+  //         }}
+  //         title="Image"
+  //         color="#000000"
+  //       />
+  //     ),
+  //   });
+  // });
+  // const [image, setImage] = useState();
+  // const selectImage = async () => {
+  //   const result = await launchImageLibrary();
+  //   console.log(result);
+  //   setImage(result);
+  //   console.log('Image Url:::' + image);
+  // };
   const user = firebase.auth().currentUser;
   if (user !== null) {
     const uid = user.id;
