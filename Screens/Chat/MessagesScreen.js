@@ -1,7 +1,8 @@
 
 import React, {Component } from 'react';
 import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
-import {firebase} from '@react-native-firebase/auth';
+import {firebase} from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 class MessagesScreen extends Component {
 
 
@@ -57,17 +58,22 @@ state = {
   state = {
     users: [],
   };
-  handlechat = userId => {
+  handlechat = (recieverId, senderId) => {
     firebase
       .firestore()
       .collection('chatroom')
       .add({
-        userId,
+        recieverId,
+        senderId,
       })
-      .then(() => {
-        this.props.navigation.navigate('Chat', {userId});
-        console.log({userId});
+      .then(docRef => {
+        const docid=docRef.id
+        this.props.navigation.navigate('Chat', {recieverId, docid});
+        console.log(docRef.id);
         console.log('Chat Room Created');
+      })
+      .catch(error => {
+        console.error('Error adding document: ', error);
       });
   };
   constructor(props) {
@@ -86,6 +92,21 @@ state = {
     //     this.setState({users});
     //     console.log(users);
     //   });
+    //  this.cities= firebase.firestore().collection("cities").doc("LA").set({
+    //     name: "Los Angeles",
+    //     state: "CA",
+    //     country: "USA"
+    // })
+    // .then(() => {
+    //     console.log("Document successfully written!");
+    // })
+    // .catch((error) => {
+    //     console.error("Error writing document: ", error);
+    // });
+
+    this.senderId = auth().currentUser.uid;
+    let sender = this.senderId;
+    console.log(sender);
 
     this.userId = firebase
       .firestore()
@@ -97,7 +118,7 @@ state = {
           let user = documentSnapshot.data();
           user.id = documentSnapshot.id;
           users.push(user);
-          console.log('User data: ', users);
+          //console.log('User data: ', users);
         });
         this.setState({users: users});
       });
@@ -123,7 +144,7 @@ state = {
             <View key={index} style={{marginTop: 20}}>
               <TouchableOpacity
                 onPress={() => {
-                  this.handlechat({user});
+                  this.handlechat({user}, this.senderId);
                 }}>
                 <View
                   style={{
