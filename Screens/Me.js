@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { Text, View, Image, StyleSheet, Pressable } from 'react-native';
+import { Text, View, Image, StyleSheet, Pressable, ToastAndroid } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { Avatar, Dialog, Button, Icon } from '@rneui/base';
 import { TextInput } from 'react-native-gesture-handler';
@@ -104,9 +104,20 @@ const MeScreen = ({ navigation }) => {
           firstName: userFirstName,
           lastName: userLastName,
         }).then(
-          () => console.log("Name Updated")
+          () => {
+            console.log("Name Updated in firestore");
+            ToastAndroid.showWithGravity(
+              "Name Updated",
+              ToastAndroid.SHORT,
+              ToastAndroid.BOTTOM,
+         
+            )
+          }
         )
       }
+    ).catch((error) => {
+      alert("Error",error)
+    }
     )
 
     console.log('Name Updated');
@@ -116,9 +127,16 @@ const MeScreen = ({ navigation }) => {
       console.log("login")
       auth().currentUser.updateEmail(Email).then(() => {
         console.log('Email Updated in firebase Authentication');
-        firestore().collection('users').doc(uid).update({email:Email}).then(()=>console.log("Email Update in database"))
-      }).catch(error => console.log(error));
-    }).catch(error => console.log(error));
+        firestore().collection('users').doc(uid).update({ email: Email }).then(() => {
+          console.log("Email Update in database");
+          ToastAndroid.showWithGravity(
+            "Email Updated",
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM,
+          )
+        })
+      }).catch(error => alert(error));
+    }).catch(error => alert(error));
    
 
 
@@ -160,7 +178,7 @@ const MeScreen = ({ navigation }) => {
       const url = await storage().ref(refUrl).getDownloadURL();
       console.log('Get download url' + JSON.stringify(url));
       await auth().currentUser.updateProfile({ photoURL: url }).then(() => {
-        firestore().collection('users').doc(uid).update({ photoURL: refUrl }).then(()=>console.log("Image update in firestoer database"));
+        firestore().collection('users').doc(uid).update({ photoURL: url }).then(()=>console.log("Image update in firestoer database"));
       })
       console.log('Add Profile Photo');
       setLoading(false);

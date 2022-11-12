@@ -175,14 +175,7 @@ const ImageUploader = ({ navigation }) => {
         );
       });
 
-      try {
-        const id = auth().currentUser.uid;
-        const docRef = firestore().collection('users').doc(id);
-        docRef.update({photoUrl: refUrl})
-        console.log("url added");
-      } catch (error) {
-        console.log(error);
-      }
+      
 
       task.then(async () => {
 
@@ -192,6 +185,14 @@ const ImageUploader = ({ navigation }) => {
         setLoadingText('Imgae Uploaded');
 
         const url = await storage().ref(refUrl).getDownloadURL();
+        try {
+          const id = auth().currentUser.uid;
+          const docRef = firestore().collection('users').doc(id);
+          docRef.update({photoUrl: url})
+          console.log("url added");
+        } catch (error) {
+          console.log(error);
+        }
 
 
         console.log('Get download url' + JSON.stringify(url));
