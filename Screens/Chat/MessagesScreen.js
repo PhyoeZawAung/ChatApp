@@ -1,7 +1,59 @@
-import React, {Component} from 'react';
+
+import React, {Component } from 'react';
 import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
 import {firebase} from '@react-native-firebase/auth';
 class MessagesScreen extends Component {
+
+
+/*
+state = { 
+    userId: '', 
+    users: [],
+}
+
+ constructor(props){
+  super(props);
+
+  this.receiverId = firebase
+    .firestore()
+    .collection('users')
+    .get()
+    .then(querySnapshot => {  
+      let id = '';
+      querySnapshot.forEach(documentSnapshot => {
+        id = documentSnapshot.id;
+        console.log('User Id: ', id);
+      });
+      this.setState({userId: id});
+    });
+
+  this.userData = firebase
+    .firestore()
+    .collection()
+    .get()
+ }
+
+ handlechat = async (userId) => {
+  try{
+    await firebase
+      .firestore()
+      .collection('chatroom')
+      .set(
+        this.receiverId,
+      ).then(() => {
+        this.props.navigation.navigate('Chat', this.state.userId);
+        console.log('Chat Room Created');
+      });
+
+  }catch(error){
+    console.log(error);
+  }
+ }
+
+*/
+
+
+  
   state = {
     users: [],
   };
@@ -50,6 +102,8 @@ class MessagesScreen extends Component {
         this.setState({users: users});
       });
   }
+
+
   render() {
     const {linkTo} = this.props;
     return (
@@ -92,8 +146,7 @@ class MessagesScreen extends Component {
                         color: '#000000',
                         marginBottom: 5,
                       }}>
-                      {user.firstName}
-                      {user.lastName}
+                      {user.firstName + " " + user.lastName}
                     </Text>
                     <Text style={{fontSize: 16, color: '#000000'}}>
                       {user.email}
@@ -120,3 +173,5 @@ class MessagesScreen extends Component {
 }
 
 export default MessagesScreen;
+
+

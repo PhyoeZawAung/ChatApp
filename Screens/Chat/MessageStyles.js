@@ -1,3 +1,4 @@
+/*
 import styled from 'styled-components';
 
 export const Container = styled.View`
@@ -62,3 +63,27 @@ export const MessageText = styled.Text`
   font-size: 14px;
   color: #333333;
 `;
+*/
+/*
+import React from 'react';
+import {View, TouchableOpacity, Text, Image} from 'react-native';
+
+const ChatListItem = () => {
+  return(
+    <View>
+      <TouchableOpacity>
+        <View>
+          <Image/>
+        </View>
+        <View>
+          <Text></Text>
+          <Text></Text>
+        </View>
+        <View>
+
+        </View>
+      </TouchableOpacity>
+    </View>
+  )
+}
+*/
