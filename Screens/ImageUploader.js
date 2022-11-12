@@ -102,17 +102,17 @@
 //
 //export default ImageUploader;
 
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, Pressable, Button} from 'react-native';
-import {Avatar, Dialog} from '@rneui/base';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Button } from 'react-native';
+import { Avatar, Dialog } from '@rneui/base';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
-import {useSelector} from 'react-redux';
-import {StackActions} from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import { StackActions } from '@react-navigation/native';
 import firestore from "@react-native-firebase/firestore";
 
-const ImageUploader = ({navigation}) => {
+const ImageUploader = ({ navigation }) => {
   const [choice, setChoice] = useState(false);
   const firstName = useSelector(store => store.firstName);
   const lastName = useSelector(store => store.lastName);
@@ -141,85 +141,91 @@ const ImageUploader = ({navigation}) => {
     console.log('Image Url:::' + image);
   };
 
+  /*
+  const submit = async () => {
+    const set = await settingProfile();
+    console.log(set);
+    console.log("RIGHT");
+  }
+  */
+
   const settingProfile = async (firstName, lastName, photoURL) => {
     setLoad(true);
     const user = auth().currentUser;
     const name = firstName + ' ' + lastName;
     if (photoURL != null) {
-   
-    const imageUrl = photoURL.assets[0].uri;
-    // path to existing file on filesystem
 
-    const refUrl = 'images/' + auth().currentUser.uid + '_profile_photo.jpg';
-    const reference = await storage().ref(refUrl);
+      const imageUrl = photoURL.assets[0].uri;
+      // path to existing file on filesystem
 
-    const pathToFile = imageUrl;
-    // uploads file
-    const task = reference.putFile(pathToFile);
+      const refUrl = 'images/' + auth().currentUser.uid + '_profile_photo.jpg';
+      const reference = await storage().ref(refUrl);
 
-    task.on('state_changed', taskSnapshot => {
-      console.log(
-        `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
-      );
-      setLoadingText(
-        `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
-      );
-    });
+      const pathToFile = imageUrl;
+      // uploads file
+      const task = reference.putFile(pathToFile);
+      
 
-    task.then(async () => {
+      task.on('state_changed', taskSnapshot => {
+        console.log(
+          `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
+        );
+        setLoadingText(
+          `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
+        );
+      });
 
-      console.log('Image uploaded to the bucket!');
-      console.log('Imgae Uploaded');
+      
 
-      setLoadingText('Imgae Uploaded');
+      task.then(async () => {
 
-       const url = await storage().ref(refUrl).getDownloadURL();
+        console.log('Image uploaded to the bucket!');
+        console.log('Imgae Uploaded');
 
-       /*
-       try {
-        await storage().ref(refUrl).getDownloadURL().then( (url) => {
-          firestore()
-            .collection("users")
-            .doc(user.uid)
-            .set({
-              url
-            })
-        });
-       } catch(error){
-        console.log(error);
-       }
-       */
-      console.log('Get download url' + JSON.stringify(url));
-      console.log(reference);
+        setLoadingText('Imgae Uploaded');
 
-      await auth().currentUser.updateProfile({photoURL: url});
+        const url = await storage().ref(refUrl).getDownloadURL();
+        try {
+          const id = auth().currentUser.uid;
+          const docRef = firestore().collection('users').doc(id);
+          docRef.update({photoUrl: url})
+          console.log("url added");
+        } catch (error) {
+          console.log(error);
+        }
 
-      console.log('Add Profile Photo');
-      console.log('Profile set');
 
-      setLoadingText('Profile set');
-      console.log("Name::::" + name)
-      await user.updateProfile({displayName: name});
+        console.log('Get download url' + JSON.stringify(url));
+        
 
-      console.log('Profile name set');
+        await auth().currentUser.updateProfile({ photoURL: url });
 
-      setLoadingText('Profile name set');
-      setLoadingText('Done');
+        console.log('Add Profile Photo');
+        console.log('Profile set');
 
-      navigation.dispatch(StackActions.replace('Home'));
+        setLoadingText('Profile set');
+        console.log("Name::::" + name)
+        await user.updateProfile({ displayName: name });
 
-      setLoad(false);
-    });
+        console.log('Profile name set');
+
+        setLoadingText('Profile name set');
+        setLoadingText('Done');
+
+        navigation.dispatch(StackActions.replace('Home'));
+
+        setLoad(false);
+      });
     }
     else {
-      await user.updateProfile({displayName: name});
+      await user.updateProfile({ displayName: name });
       console.log('Profile name set');
       setLoadingText('Profile name set');
       setLoadingText('Done');
       navigation.dispatch(StackActions.replace('Home'));
       setLoad(false);
     }
-    
+
   };
   return (
     <View style={styles.container}>
@@ -230,9 +236,9 @@ const ImageUploader = ({navigation}) => {
             <Avatar
               size={100}
               rounded
-              source={{uri: image.assets[0].uri}}
+              source={{ uri: image.assets[0].uri }}
               title="PF"
-              containerStyle={{backgroundColor: 'grey'}}>
+              containerStyle={{ backgroundColor: 'grey' }}>
               <Avatar.Accessory
                 size={35}
                 onPress={() => {
@@ -245,7 +251,7 @@ const ImageUploader = ({navigation}) => {
               size={100}
               rounded
               title="PF"
-              containerStyle={{backgroundColor: 'grey'}}>
+              containerStyle={{ backgroundColor: 'grey' }}>
               <Avatar.Accessory
                 size={35}
                 onPress={() => {
@@ -259,7 +265,7 @@ const ImageUploader = ({navigation}) => {
           <Dialog
             isVisible={choice}
             onBackdropPress={toggleChoice}
-            overlayStyle={{backgroundColor: '#fff', borderRadius: 10}}>
+            overlayStyle={{ backgroundColor: '#fff', borderRadius: 10 }}>
             <Dialog.Title title="Pick An Option" />
 
             <Pressable
@@ -269,7 +275,7 @@ const ImageUploader = ({navigation}) => {
                 toggleChoice();
                 getImageFromCamera();
               }}>
-              <Text style={{color: '#fff', fontWeight: 'bold'}}>
+              <Text style={{ color: '#fff', fontWeight: 'bold' }}>
                 Open Camera
               </Text>
             </Pressable>
@@ -280,7 +286,7 @@ const ImageUploader = ({navigation}) => {
                 toggleChoice();
                 selectImage();
               }}>
-              <Text style={{color: '#fff', fontWeight: 'bold'}}>
+              <Text style={{ color: '#fff', fontWeight: 'bold' }}>
                 Choose From Storage
               </Text>
             </Pressable>
@@ -290,12 +296,12 @@ const ImageUploader = ({navigation}) => {
                 console.log('cancel the opltion');
                 toggleChoice();
               }}>
-              <Text style={{color: '#fff', fontWeight: 'bold'}}>Cancel</Text>
+              <Text style={{ color: '#fff', fontWeight: 'bold' }}>Cancel</Text>
             </Pressable>
           </Dialog>
           <Dialog
             isVisible={load}
-            overlayStyle={{backgroundColor: '#fff', borderRadius: 10}}>
+            overlayStyle={{ backgroundColor: '#fff', borderRadius: 10 }}>
             <Dialog.Title title="Setting Up Your Profile" />
             <Text>{loadingText}</Text>
 
@@ -308,7 +314,7 @@ const ImageUploader = ({navigation}) => {
             console.log('click continue');
             settingProfile(firstName, lastName, image);
           }}>
-          <Text style={{color: '#fff', fontWeight: 'bold'}}>
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>
             Continue to App
           </Text>
         </Pressable>

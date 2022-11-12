@@ -6,6 +6,16 @@ import {useEffect, useState, useCallback} from 'react';
 import {View, Text} from 'react-native';
 import {GiftedChat} from 'react-native-gifted-chat';
 function ChatScreen({navigation}) {
+  const chatroomId = firebase
+    .firestore()
+    .collection('chatroom')
+    .get()
+    .then(querySnapshot => {
+      querySnapshot.forEach(documentSnapshot => {
+        let chatroom = documentSnapshot.data();
+        chatroom.id = documentSnapshot.id;
+      });
+    });
   const route = useRoute();
   useEffect(() => {
     navigation.setOptions({
@@ -13,8 +23,9 @@ function ChatScreen({navigation}) {
       headerLeft: () => (
         <View style={{flexDirection: 'row'}}>
           <Text>Image</Text>
-          <Text>{route.params.userId.user.firstName} </Text>
-          <Text>{route.params.userId.user.lastName} </Text>
+          <Text> </Text>
+          <Text>{route.params.recieverId.user.firstName} </Text>
+          <Text>{route.params.recieverId.user.lastName} </Text>
         </View>
       ),
     });
@@ -27,6 +38,8 @@ function ChatScreen({navigation}) {
   useLayoutEffect(() => {
     const Unsubscribe = firebase
       .firestore()
+      .collection('chatroom')
+      .doc('{route.params.docid} ')
       .collection('messages')
       .orderBy('createdAt', 'desc')
       .onSnapshot(snapshot =>
@@ -50,6 +63,8 @@ function ChatScreen({navigation}) {
     const {_id, createdAt, text, user} = messages[0];
     firebase
       .firestore()
+      .collection('chatroom')
+      .doc(route.params.docid)
       .collection('messages')
       .add({
         _id,
@@ -67,7 +82,9 @@ function ChatScreen({navigation}) {
       showAvatarForEveryMessage={true}
       onSend={messages => onSend(messages)}
       user={{
-        _id: auth().currentUser.email,
+        _id: auth().currentUser.uid,
+        name: auth().currentUser.displayName,
+        avatar: auth().currentUser.photoURL,
       }}
     />
   );
