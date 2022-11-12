@@ -5,15 +5,29 @@ import {ScrollView} from 'react-native-gesture-handler';
 
 function ContactScreen() {
   var citiesRef = firebase.firestore().collection('cities');
-  var museums = firebase
+  var messages = firebase
     .firestore()
-    .collectionGroup('landmarks')
-    .where('type', '==', 'museum');
-  museums.get().then(querySnapshot => {
+    .collectionGroup('messages')
+    //.where('type', '==', 'museum');
+  messages.get().then(querySnapshot => {
     querySnapshot.forEach(doc => {
       console.log(doc.id, ' => ', doc.data());
     });
   });
+  var City = firebase
+    .firestore()
+    .collection('chatroom')
+    //.where('capital', '==', true)
+    .get()
+    .then(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        // doc.data() is never undefined for query doc snapshots
+        console.log(doc.id, ' => ', doc.data());
+      });
+    })
+    .catch(error => {
+      console.log('Error getting documents: ', error);
+    });
   return (
     <ScrollView style={{backgroundColor: '#4F3B70'}}>
       <View style={{padding: 20}}>
