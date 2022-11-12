@@ -1,39 +1,62 @@
 import React from 'react';
-import {useEffect} from 'react';
-import {useState} from 'react';
-import {Text, View, Image, StyleSheet, Pressable} from 'react-native';
+import { useEffect } from 'react';
+import { useState } from 'react';
+import { Text, View, Image, StyleSheet, Pressable } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import {Avatar, Dialog, Button, Icon} from '@rneui/base';
-import {TextInput} from 'react-native-gesture-handler';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { Avatar, Dialog, Button, Icon } from '@rneui/base';
+import { TextInput } from 'react-native-gesture-handler';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import storage from "@react-native-firebase/storage";
 import { createIconSetFromFontello } from 'react-native-vector-icons';
 import { TestScheduler } from 'jest';
-const MeScreen = () => {
+import firestore from "@react-native-firebase/firestore";
+const MeScreen = ({ navigation }) => {
   const [userPhoto, setUserPhoto] = useState();
-  const [userName, setUserName] = useState();
+  const [userFirstName, setUserFirstName] = useState();
+  const [userLastName, setUserLastName] = useState();
   const [userEmail, setUserEmail] = useState();
-  const [userPhone, setUserPhone] = useState();
-  const [uid , setUid] = useState();
-  const [updateUserName, setUpdateUserName] = useState();
+  const [uid, setUid] = useState();
+
+
+  const [updateUserFirstName, setUpdateUserFirstName] = useState();
+  const [updateUserLastName, setUpdateUserLastName] = useState();
   const [updateUserEmail, setUpdateUserEmail] = useState();
   const [updateUserPhoto, setUpdateUserPhoto] = useState();
   const [updateUserPhone, setUpdateUserPhone] = useState();
-
-  const [editName, setEditName] = useState(false);
+  const [password, setPassword] = useState();
+  const [editFirstName, setEditFirstName] = useState(false);
+  const [editLastName, setEditLastName] = useState(false);
   const [editMail, setEditMail] = useState(false);
   const [editPhone, setEditPhone] = useState(false);
   const [choice, setChoice] = useState(false);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
-    const user = auth().currentUser;
-    if (user !== null) {
-      setUserPhoto(user.photoURL);
-      setUserName(user.displayName);
-      setUserEmail(user.email);
-      setUserPhone(user.phoneNumber); 
-      setUid(user.uid);
+    auth().currentUser;
+    async function getUserData() {
+      const user = await auth().currentUser;
+      if (user != null) {
+        setUserPhoto(user.photoURL);
+        setUserEmail(user.email);
+        setUid(user.uid);
+        let id = user.uid;
+        if (id !== null) {
+          console.log(id);
+          await firestore().collection("users").doc(id).get()
+          .then(data => {
+            console.log(data)
+            setUserFirstName(data._data.firstName);
+            setUserLastName(data._data.lastName);
+            setPassword(data._data.password);
+
+
+          }).catch(error=>console.log(error))
+          
+        }
+      
+      }
     }
+    getUserData();
+
   }, []);
   const toggleChoice = () => {
     setChoice(!choice);
@@ -57,9 +80,12 @@ const MeScreen = () => {
     setUserPhoto(updateUserPhoto);
     console.log('Image Url:::' + userPhoto);
   };
-  const toggleEdit = () => {
-    setEditName(!editName);
+  const toggleEditFirstName = () => {
+    setEditFirstName(!editFirstName);
   };
+  const toggleEditLastName = () => {
+    setEditLastName(!editLastName);
+  }
   const toggleEditMail = () => {
     setEditMail(!editMail);
   };
@@ -68,17 +94,34 @@ const MeScreen = () => {
   };
   //this function update the name of user
 
-  const UpdateName = async (name) => {
-    await auth().currentUser.updateProfile({ displayName: name })
-    
+  const UpdateName = async (userFirstName, userLastName) => {
+    let name = userFirstName + " " + userLastName;
+    await auth().currentUser.updateProfile({ displayName: name }).then(
+      () => {
+        firestore().collection('users').doc(
+          uid
+        ).update({
+          firstName: userFirstName,
+          lastName: userLastName,
+        }).then(
+          () => console.log("Name Updated")
+        )
+      }
+    )
+
     console.log('Name Updated');
   };
   const UpdateEmail = async (Email) => {
-    await auth().currentUser.updateEmail(Email).then(() => {
-      console.log('Email Updated');
+    await auth().signInWithEmailAndPassword(auth().currentUser.email, password).then(() => {
+      console.log("login")
+      auth().currentUser.updateEmail(Email).then(() => {
+        console.log('Email Updated in firebase Authentication');
+        firestore().collection('users').doc(uid).update({email:Email}).then(()=>console.log("Email Update in database"))
+      }).catch(error => console.log(error));
     }).catch(error => console.log(error));
    
-    
+
+
   };
   const UpdatePassword = async Password => {
     //await auth().currentUser.updatePassword(Password)
@@ -96,27 +139,29 @@ const MeScreen = () => {
     setLoading(true);
     console.log("Update Photo");
     const imageUrl = photo;
-     // path to existing file on filesystem
- 
-     const refUrl = 'images/' + auth().currentUser.uid + '_profile_photo.jpg';
-     const reference = await storage().ref(refUrl);
-     const pathToFile = imageUrl;
-     // uploads file
-     const task = reference.putFile(pathToFile);
- 
-     task.on('state_changed', taskSnapshot => {
-       console.log(
-         `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
-       );
+    // path to existing file on filesystem
+
+    const refUrl = 'images/' + auth().currentUser.uid + '_profile_photo.jpg';
+    const reference = await storage().ref(refUrl);
+    const pathToFile = imageUrl;
+    // uploads file
+    const task = reference.putFile(pathToFile);
+
+    task.on('state_changed', taskSnapshot => {
+      console.log(
+        `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
+      );
       // setLoadingText(
       //   `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
       // );
-     });
-    task.then(async() => {
+    });
+    task.then(async () => {
       console.log("Image Uploaded");
       const url = await storage().ref(refUrl).getDownloadURL();
       console.log('Get download url' + JSON.stringify(url));
-      await auth().currentUser.updateProfile({photoURL: url});
+      await auth().currentUser.updateProfile({ photoURL: url }).then(() => {
+        firestore().collection('users').doc(uid).update({ photoURL: refUrl }).then(()=>console.log("Image update in firestoer database"));
+      })
       console.log('Add Profile Photo');
       setLoading(false);
     })
@@ -129,19 +174,19 @@ const MeScreen = () => {
       })
       .catch(error => console.error(error));
   };
-  const SettingProfile = async (name, email, phone, photo,updateName,updateEmail,updatePhone,updatePhoto) => {
-   
-    if (name != null && updateName != null) {
-      if (name != "") {
-        UpdateName(name)
+  const SettingProfile = async (firstname, lastname, email, photo, updateFirstName, updateLastName, updateEmail, updatePhoto) => {
+
+    if (firstname != null && updateFirstName != null) {
+      if (firstname != "") {
+        UpdateName(firstname, lastname)
       }
-      
+
     }
     if (email != null && updateEmail != null) {
       if (email != "") {
         UpdateEmail(email)
       }
-      
+
     }
     //if (phone != null && updatePhone != null) {
     //  if (phone != "") {
@@ -152,7 +197,7 @@ const MeScreen = () => {
     if (photo != null && updatePhoto != null) {
       UpdatePhoto(photo)
     }
-    
+
   }
   return (
     <View style={styles.container}>
@@ -165,8 +210,8 @@ const MeScreen = () => {
           //      url = updateUserPhoto != null ?
           //     (userPhoto):(updateUserPhoto)
           // }}}
-          source={{uri: userPhoto}}
-          containerStyle={{backgroundColor: 'grey'}}>
+          source={{ uri: userPhoto }}
+          containerStyle={{ backgroundColor: 'grey' }}>
           <Avatar.Accessory
             size={40}
             onPress={() => {
@@ -178,7 +223,7 @@ const MeScreen = () => {
           size={100}
           rounded
           title="PF"
-          containerStyle={{backgroundColor: 'grey'}}>
+          containerStyle={{ backgroundColor: 'grey' }}>
           <Avatar.Accessory
             size={40}
             onPress={() => {
@@ -186,11 +231,11 @@ const MeScreen = () => {
             }}></Avatar.Accessory>
         </Avatar>
       )}
-      <Text style={{color:"#fff",paddingVertical:20}}>{uid}</Text>
+      <Text style={{ color: "#fff", paddingVertical: 20 }}>{uid}</Text>
       <Dialog
         isVisible={choice}
         onBackdropPress={toggleChoice}
-        overlayStyle={{backgroundColor: '#fff', borderRadius: 10}}>
+        overlayStyle={{ backgroundColor: '#fff', borderRadius: 10 }}>
         <Dialog.Title title="Pick An Option" />
 
         <Pressable
@@ -200,7 +245,7 @@ const MeScreen = () => {
             toggleChoice();
             getImageFromCamera();
           }}>
-          <Text style={{color: '#fff', fontWeight: 'bold'}}>Open Camera</Text>
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>Open Camera</Text>
         </Pressable>
         <Pressable
           style={styles.button}
@@ -209,7 +254,7 @@ const MeScreen = () => {
             toggleChoice();
             selectImage();
           }}>
-          <Text style={{color: '#fff', fontWeight: 'bold'}}>
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>
             Choose From Storage
           </Text>
         </Pressable>
@@ -219,32 +264,52 @@ const MeScreen = () => {
             console.log('cancel the opltion');
             toggleChoice();
           }}>
-          <Text style={{color: '#fff', fontWeight: 'bold'}}>Cancel</Text>
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>Cancel</Text>
         </Pressable>
       </Dialog>
-      <Dialog isVisible={loading} overlayStyle={{backgroundColor:"#fff"}}>
-        <Dialog.Title title="Saving.."/>
+      <Dialog isVisible={loading} overlayStyle={{ backgroundColor: "#fff" }}>
+        <Dialog.Title title="Saving.." />
         <Dialog.Loading></Dialog.Loading>
       </Dialog>
 
       <View style={styles.EditView}>
-        {editName ? (
+        {editFirstName ? (
           <TextInput
-            style={{borderBottomWidth: 1, width: '80%',borderBottomColor:"#fff"}}
-            placeholder={userName}
-            onChangeText={text => setUpdateUserName(text)}></TextInput>
+            style={{ borderBottomWidth: 1, width: '80%', borderBottomColor: "#fff" }}
+            placeholder={userFirstName}
+            onChangeText={text => setUpdateUserFirstName(text)}></TextInput>
         ) : (
-          <View style={{flexDirection: 'row'}}>
+          <View style={{ flexDirection: 'row' }}>
             <Icon name="person" color={'#fff'} />
-            <Text style={{color: '#fff', paddingLeft: 10}}>{userName}</Text>
+            <Text style={{ color: '#fff', paddingLeft: 10 }}>{userFirstName}</Text>
           </View>
         )}
         <Pressable
           onPress={() => {
-            toggleEdit();
-            setUserName(updateUserName);
+            toggleEditFirstName();
+            setUserFirstName(updateUserFirstName);
           }}>
-          {!editName ? <Text>Edit</Text> : <Text>Done</Text>}
+          {!editFirstName ? <Text>Edit</Text> : <Text>Done</Text>}
+        </Pressable>
+      </View>
+      <View style={styles.EditView}>
+        {editLastName ? (
+          <TextInput
+            style={{ borderBottomWidth: 1, width: '80%', borderBottomColor: "#fff" }}
+            placeholder={userLastName}
+            onChangeText={text => setUpdateUserLastName(text)}></TextInput>
+        ) : (
+          <View style={{ flexDirection: 'row' }}>
+            <Icon name="person" color={'#fff'} />
+            <Text style={{ color: '#fff', paddingLeft: 10 }}>{userLastName}</Text>
+          </View>
+        )}
+        <Pressable
+          onPress={() => {
+            toggleEditLastName();
+            setUserLastName(updateUserLastName);
+          }}>
+          {!editLastName ? <Text>Edit</Text> : <Text>Done</Text>}
         </Pressable>
       </View>
       <View style={styles.EditView}>
@@ -252,13 +317,14 @@ const MeScreen = () => {
           <TextInput
             style={{
               borderBottomWidth: 1, width: '80%',
-            borderBottomColor:"#fff"}}
+              borderBottomColor: "#fff"
+            }}
             placeholder={userEmail}
             onChangeText={text => setUpdateUserEmail(text)}></TextInput>
         ) : (
-          <View style={{flexDirection: 'row'}}>
+          <View style={{ flexDirection: 'row' }}>
             <Icon name="mail" color={'#fff'} />
-            <Text style={{color: '#fff', paddingLeft: 10}}>{userEmail}</Text>
+            <Text style={{ color: '#fff', paddingLeft: 10 }}>{userEmail}</Text>
           </View>
         )}
         <Pressable
@@ -294,22 +360,27 @@ const MeScreen = () => {
         </Pressable>
       </View>*/}
 
-      
+
       <Pressable style={styles.button}
-       onPress={() => {
-        SettingProfile(userName, userEmail, userPhone,userPhoto,updateUserName,updateUserEmail,updateUserPhone,updateUserPhoto );
-      }}>
-        <Text style={{color:"#fff",fontWeight:'bold'}}>Save</Text>
+        onPress={() => {
+          SettingProfile(userFirstName, userLastName, userEmail, userPhoto, updateUserFirstName, updateUserLastName, updateUserEmail, updateUserPhoto);
+        }}>
+        <Text style={{ color: "#fff", fontWeight: 'bold' }}>Save</Text>
       </Pressable>
-    
       <Pressable style={styles.button}
-       onPress={() => {
-        SignOut();
-      }}>
-        <Text style={{color:"#fff",fontWeight:'bold'}}>SignOut</Text>
-       </Pressable>
-     
-      
+        onPress={() => {
+          navigation.navigate("ChangePassword");
+        }}>
+        <Text style={{ color: "#fff", fontWeight: 'bold' }}>Change Password</Text>
+      </Pressable>
+      <Pressable style={styles.button}
+        onPress={() => {
+          SignOut();
+        }}>
+        <Text style={{ color: "#fff", fontWeight: 'bold' }}>SignOut</Text>
+      </Pressable>
+
+
     </View>
   );
 };
@@ -328,7 +399,7 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 15,
     borderBottomWidth: 1,
-    borderBottomColor:"#aeaeae",
+    borderBottomColor: "#aeaeae",
     height: 60,
   },
   button: {
