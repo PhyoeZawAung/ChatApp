@@ -259,8 +259,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
-<<<<<<< HEAD
 export default ChangePasswordScreen;
-=======
-export default ChangePasswordScreen;
->>>>>>> d1caaf12bc76166e3e77186e3a2ba1778132d638
