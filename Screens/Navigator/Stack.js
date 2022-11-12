@@ -41,7 +41,6 @@ const StackScreen = () => {
         {!user ? (
           <Stack.Navigator>
             <Stack.Group screenOptions={{headerShown:false}}>
-              <Stack.Screen name="Start" component={StartScreen} />
               <Stack.Screen name="Login" component={LoginScreen} />
               <Stack.Screen name="SignUp" component={SignUpScreen} />
               <Stack.Screen name="Forgot" component={ForgotScreen} />

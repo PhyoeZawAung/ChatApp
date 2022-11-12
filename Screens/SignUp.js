@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
-import {useSelector, useDispatch, Provider} from 'react-redux';
-import {SetUser} from '../Redux/User/UserAction';
+import React, { useState } from 'react';
+import { useSelector, useDispatch, Provider } from 'react-redux';
+import { SetUser } from '../Redux/User/UserAction';
 import {
   View,
   Text,
@@ -10,93 +10,61 @@ import {
   ToastAndroid,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import {Formik} from 'formik';
+import { Formik } from 'formik';
 import * as yup from 'yup';
 import firestore from "@react-native-firebase/firestore";
 
-const SignUpScreen = ({navigation}) => {
+const SignUpScreen = ({ navigation }) => {
 
   const [showhide, setShowHide] = useState(true);
   const dispatch = useDispatch();
   const setUserName = (firstName, lastName) => {
     dispatch(
-      SetUser({firstName: firstName, lastName: lastName, nameAdded: true}),
+      SetUser({
+        firstName: firstName,
+        lastName: lastName,
+        nameAdded: true,
+      }),
     );
     console.log("user name" + firstName + lastName);
   };
+
   const Show = showhide => {
     if (showhide == true) {
       return false;
     } else return true;
   };
 
-  /*
-  const signup = (email, password) => {
-    if (email != '' && password != '') {
-      auth()
+  const signup = async (email, password, firstName, lastName) => {
+    try {
+      await auth()
         .createUserWithEmailAndPassword(email, password)
-        .then(() => {
-          console.log('User account created & signed in!');
-          //navigation.navigate("Message");
-
-          ToastAndroid.showWithGravity(
-            'Account Create Successfully',
-            ToastAndroid.SHORT,
-            ToastAndroid.BOTTOM,
-          );
-        })
-        .catch(error => {
-          if (error.code === 'auth/email-already-in-use') {
-            console.log('That email address is already in use!');
-          }
-
-          if (error.code === 'auth/invalid-email') {
-            console.log('That email address is invalid!');
-          }
-
-          console.error(error);
+        .then((cred) => {
+          firestore()
+            .collection("users")
+            .doc(cred.user.uid)
+            .set({
+              firstName,
+              lastName,
+              email,
+              password,
+            });
         });
+    } catch (error) {
+
+      if (error.code === 'auth/email-already-in-use') {
+        console.log('That email address is already in use!');
+        alert('That email address is already in use! , try login');
+        navigation.navigate("Login");
+      }
+
+      if (error.code === 'auth/invalid-email') {
+        console.log('That email address is invalid!');
+      }
+
+      console.error(error);
     }
   };
-*/
-
-const signup = async (email, password, firstName, lastName) => {
-  try {
-    await auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then( (cred) => {
-        firestore()
-          .collection("users")
-          .doc(cred.user.uid)
-          .set({
-            firstName,
-            lastName,
-            email,
-            password,
-          })
-      })
-  } catch (error) {
-
-    if (error.code === 'auth/email-already-in-use') {
-      console.log('That email address is already in use!');
-      alert('That email address is already in use! , try login');
-      navigation.navigate("Login");
-    }
-
-    if (error.code === 'auth/invalid-email') {
-      console.log('That email address is invalid!');
-    }
-
-    console.error(error);
-  }
-};
-
-/*
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-*/
   return (
     <View style={styles.container}>
       <View style={styles.signUpCard}>
@@ -116,7 +84,7 @@ const signup = async (email, password, firstName, lastName) => {
             mail: yup.string().email('Invalid Email').required('Enter Email'),
             password: yup
               .string()
-              .min(8, ({min}) => `password must be ${min} characters`)
+              .min(8, ({ min }) => `password must be ${min} characters`)
               .matches(/[0-9]/, 'Must Contain number(0 to 9)')
 
               .required('Enter Password'),
@@ -126,13 +94,13 @@ const signup = async (email, password, firstName, lastName) => {
               .oneOf([yup.ref('password'), null], "Password doesn't match")
               .required('Enter Password'),
           })}
-          onSubmit={ (values, formikAction) => {
-              setTimeout( () => {
-                console.log(JSON.stringify(values));
-                setUserName(values.firstName, values.lastName);
-                signup(values.mail, values.password, values.firstName, values.lastName);
-                formikAction.setSubmitting(false);
-              }, 500);  
+          onSubmit={(values, formikAction) => {
+            setTimeout(() => {
+              console.log(JSON.stringify(values));
+              setUserName(values.firstName, values.lastName);
+              signup(values.mail, values.password, values.firstName, values.lastName);
+              formikAction.setSubmitting(false);
+            }, 500);
           }}>
           {props => (
             <View style={styles.InputBox}>
@@ -212,7 +180,7 @@ const signup = async (email, password, firstName, lastName) => {
                   console.log('press');
                   props.handleSubmit();
                 }}>
-                <Text style={{color: '#fff', fontWeight: 'bold'}}>
+                <Text style={{ color: '#fff', fontWeight: 'bold' }}>
                   Register
                 </Text>
               </Pressable>
