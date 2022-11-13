@@ -5,13 +5,16 @@ import auth from '@react-native-firebase/auth';
 class ContactScreen extends Component {
   state = {
     users: [],
+    empty: true,
   };
   handlechat = (user1, user2) => {
+    const part = firebase.firestore('chatroom').get();
+    console.log(part);
     firebase
       .firestore()
       .collection('chatroom')
       //.where(recieverId && senderId, '!=', recieverId && senderId)
-
+      //.where('participantId.user1&&participantId.user2', '!=', user1 && user2)
       .add({
         participantId: {
           user1,
@@ -86,61 +89,53 @@ class ContactScreen extends Component {
             Contacts
           </Text>
         </View>
-        <View
-          style={{
-            backgroundColor: '#ffffff',
-            borderTopRightRadius: 40,
-            borderTopLeftRadius: 40,
-          }}>
-          {this.state.users.map((user, index) => (
-            <View key={index} style={{marginTop: 20}}>
-              <TouchableOpacity
-                onPress={() => {
-                  this.handlechat(user.id, this.senderId);
+        {this.state.users.map((user, index) => (
+          <View
+            key={index}
+            style={{
+              marginTop: 20,
+              borderRadius: 20,
+              marginTop: 27,
+              backgroundColor: '#ffffff',
+              marginHorizontal: 20,
+            }}>
+            <TouchableOpacity
+              onPress={() => {
+                this.handlechat(user.id, this.senderId);
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  paddingHorizontal: 20,
+                  paddingVertical: 20,
+                  alignItems: 'center',
                 }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    paddingHorizontal: 20,
-                    paddingVertical: 20,
-                    alignItems: 'center',
-                  }}>
-                  <View style={{marginRight: 40}}>
-                    <Image
-                      source={{uri: user?.photoURL}}
-                      style={{width: 50, height: 50, borderRadius: 100}}
-                    />
-                  </View>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 'bold',
-                        color: '#000000',
-                        marginBottom: 5,
-                      }}>
-                      {user.firstName}
-                      {user.lastName}
-                    </Text>
-                    <Text style={{fontSize: 16, color: '#000000'}}>
-                      {user.email}
-                    </Text>
-                  </View>
+                <View style={{marginRight: 40}}>
+                  <Image
+                    source={
+                      this.state.empty.true
+                        ? {uri: user?.photoURL}
+                        : require('../images/default_image.png')
+                    }
+                    style={{width: 50, height: 50, borderRadius: 100}}
+                  />
+                </View>
+                <View style={{flexDirection: 'column'}}>
                   <Text
                     style={{
-                      position: 'absolute',
-                      right: 25,
                       fontSize: 16,
                       fontWeight: 'bold',
                       color: '#000000',
+                      marginBottom: 5,
                     }}>
-                    {user.time}
+                    {user.firstName}
+                    {user.lastName}
                   </Text>
                 </View>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
+              </View>
+            </TouchableOpacity>
+          </View>
+        ))}
       </ScrollView>
     );
   }
