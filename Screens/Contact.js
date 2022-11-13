@@ -113,7 +113,7 @@ class ContactScreen extends Component {
                 <View style={{marginRight: 40}}>
                   <Image
                     source={
-                      this.state.empty.true
+                      user?.photoURL
                         ? {uri: user?.photoURL}
                         : require('../images/default_image.png')
                     }
