@@ -8,30 +8,36 @@ class MessagesScreen extends Component {
 
 /*
 state = { 
-    userId: '', 
+    participantsId: [], 
     users: [],
 }
 
  constructor(props){
   super(props);
 
+  this.senderId = auth().currentUser.uid;
   this.receiverId = firebase
     .firestore()
     .collection('users')
     .get()
-    .then(querySnapshot => {  
-      let id = '';
+    .then(querySnapshot => {
       querySnapshot.forEach(documentSnapshot => {
-        id = documentSnapshot.id;
-        console.log('User Id: ', id);
+        let id = documentSnapshot.id;
+        console.log('Receiver Id: ', id);
       });
-      this.setState({userId: id});
+      //this.setState({participantsId: id});
     });
+  let ids = [];
+  console.log("S:::::" , this.senderId);
+  console.log("R:::::" , this.receiverId);
+  ids.push(this.senderId, this.receiverId);
+  this.setState({participantsId: ids});
+  //console.log("Sender: ", this.state.participantsId[0]);
+  console.log("Receiver: ", this.state.participantsId[1]);
+  //this.participantsId.push(this.senderId, this.receiverId);
+  //this.setState({participantsId});
 
-  this.userData = firebase
-    .firestore()
-    .collection()
-    .get()
+  
  }
 
  handlechat = async (userId) => {
@@ -40,9 +46,11 @@ state = {
       .firestore()
       .collection('chatroom')
       .set(
-        this.receiverId,
+        this.participantsId,
       ).then(() => {
-        this.props.navigation.navigate('Chat', this.state.userId);
+        const docId=docRef.id
+        this.props.navigation.navigate('Chat', {recieverId, docId});
+        console.log(docRef.id);
         console.log('Chat Room Created');
       });
 
@@ -50,11 +58,12 @@ state = {
     console.log(error);
   }
  }
-
 */
 
 
-  
+
+
+
   state = {
     users: [],
   };
