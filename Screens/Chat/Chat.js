@@ -18,19 +18,19 @@ function ChatScreen({navigation}) {
       });
     });
   const route = useRoute();
-  useEffect(() => {
-    navigation.setOptions({
-      title: '',
-      headerLeft: () => (
-        <View style={{flexDirection: 'row'}}>
-          <Text>Image</Text>
-          <Text> </Text>
-          <Text>{route.params.recieverId.user.firstName} </Text>
-          <Text>{route.params.recieverId.user.lastName} </Text>
-        </View>
-      ),
-    });
-  });
+  // useEffect(() => {
+  //   navigation.setOptions({
+  //     title: '',
+  //     headerLeft: () => (
+  //       <View style={{flexDirection: 'row'}}>
+  //         <Text>Image</Text>
+  //         <Text> </Text>
+  //         <Text>{route.params.recieverId.user.firstName} </Text>
+  //         <Text>{route.params.recieverId.user.lastName} </Text>
+  //       </View>
+  //     ),
+  //   });
+  // });
   const sender = firebase.auth().currentUser;
   if (sender !== null) {
     const uid = sender.id;
@@ -40,7 +40,7 @@ function ChatScreen({navigation}) {
     const Unsubscribe = firebase
       .firestore()
       .collection('chatroom')
-      .doc('{route.params.docid} ')
+      .doc(route.params.docid)
       .collection('messages')
       .orderBy('createdAt', 'desc')
       .onSnapshot(snapshot =>

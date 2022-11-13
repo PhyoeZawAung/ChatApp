@@ -1,8 +1,9 @@
-
-import React, {Component } from 'react';
-import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
-import {firebase} from '@react-native-firebase/firestore';
+import {firebase, collectionGroup} from '@react-native-firebase/firestore';
+import React, {Component, useState} from 'react';
+import {View, Text, TouchableOpacity, Image} from 'react-native';
+import {ScrollView} from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
+
 class MessagesScreen extends Component {
 
 
@@ -10,39 +11,10 @@ class MessagesScreen extends Component {
 state = { 
     participantsId: [], 
     users: [],
-}
-
- constructor(props){
-  super(props);
-
-  this.senderId = auth().currentUser.uid;
-  this.receiverId = firebase
-    .firestore()
-    .collection('users')
-    .get()
-    .then(querySnapshot => {
-      querySnapshot.forEach(documentSnapshot => {
-        let id = documentSnapshot.id;
-        console.log('Receiver Id: ', id);
-      });
-      //this.setState({participantsId: id});
-    });
-  let ids = [];
-  console.log("S:::::" , this.senderId);
-  console.log("R:::::" , this.receiverId);
-  ids.push(this.senderId, this.receiverId);
-  this.setState({participantsId: ids});
-  //console.log("Sender: ", this.state.participantsId[0]);
-  console.log("Receiver: ", this.state.participantsId[1]);
-  //this.participantsId.push(this.senderId, this.receiverId);
-  //this.setState({participantsId});
-
-  
- }
-
- handlechat = async (userId) => {
-  try{
-    await firebase
+  };
+  constructor(props) {
+    super(props);
+    this.chatroom = firebase
       .firestore()
       .collection('chatroom')
       .set(
@@ -52,6 +24,9 @@ state = {
         this.props.navigation.navigate('Chat', {recieverId, docId});
         console.log(docRef.id);
         console.log('Chat Room Created');
+      })
+      .catch(error => {
+        console.log('Error getting documents: ', error);
       });
 
   }catch(error){
@@ -65,82 +40,55 @@ state = {
 
 
   state = {
-    users: [],
-  };
-  handlechat = (recieverId, senderId) => {
-    firebase
-      .firestore()
-      .collection('chatroom')
-      .add({
-        recieverId,
-        senderId,
-      })
-      .then(docRef => {
-        const docid=docRef.id
-        this.props.navigation.navigate('Chat', {recieverId, docid});
-        console.log(docRef.id);
-        console.log('Chat Room Created');
-      })
-      .catch(error => {
-        console.error('Error adding document: ', error);
-      });
+    chats: [],
+    messages: [],
   };
   constructor(props) {
     super(props);
-    //this.getUser();
-    //this.state = {text: ' '};
-
-    // this.subscriber = firebase
-    //   .firestore()
-    //   .collection('users')
-    //   .onSnapshot(docs => {
-    //     let users = [];
-    //     docs.forEach(doc => {
-    //       users.push(doc.data());
-    //     });
-    //     this.setState({users});
-    //     console.log(users);
-    //   });
-    //  this.cities= firebase.firestore().collection("cities").doc("LA").set({
-    //     name: "Los Angeles",
-    //     state: "CA",
-    //     country: "USA"
-    // })
-    // .then(() => {
-    //     console.log("Document successfully written!");
-    // })
-    // .catch((error) => {
-    //     console.error("Error writing document: ", error);
-    // });
-
-    this.senderId = auth().currentUser.uid;
-    let sender = this.senderId;
-    console.log(sender);
-
-    this.userId = firebase
+    this.chatroom = firebase
       .firestore()
-      .collection('users')
+      .collection('chatroom')
+      .where('participantId.user2', '==', auth().currentUser.uid)
+      //.where('participantId.user1', '==', auth().currentUser.uid)
       .get()
       .then(querySnapshot => {
-        let users = [];
-        querySnapshot.forEach(documentSnapshot => {
-          let user = documentSnapshot.data();
-          user.id = documentSnapshot.id;
-          users.push(user);
-          //console.log('User data: ', users);
+        let chats = [];
+        querySnapshot.forEach(doc => {
+          // doc.data() is never undefined for query doc snapshots
+          console.log(doc.id, ' => ', doc.data());
+          let chatdetail = doc.data();
+          chatdetail.id = doc.id;
+          chats.push(chatdetail);
+          //console.log(chats);
         });
-        this.setState({users: users});
+        this.setState({chats: chats});
+        console.log(chats);
+      })
+      .catch(error => {
+        console.log('Error getting documents: ', error);
       });
+      
+    //messages
+    var messages = firebase.firestore().collectionGroup('messages');
+    //.where('type', '==', 'museum');
+    messages.get().then(querySnapshot => {
+      let messages = [];
+      querySnapshot.forEach(doc => {
+        let messageBox = doc.data();
+        messages.push(messageBox);
+        //console.log(doc.id, ' => ', doc.data());
+      });
+      this.setState({messages: messages});
+    });
   }
 
 
   render() {
-    const {linkTo} = this.props;
     return (
       <ScrollView style={{backgroundColor: '#4F3B70'}}>
         <View style={{padding: 20}}>
           <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold'}}>
-            Messages
+            My Chatlists
           </Text>
         </View>
         <View
@@ -149,12 +97,9 @@ state = {
             borderTopRightRadius: 40,
             borderTopLeftRadius: 40,
           }}>
-          {this.state.users.map((user, index) => (
+          {/* {this.state.chats.map((chat, index) => (
             <View key={index} style={{marginTop: 20}}>
-              <TouchableOpacity
-                onPress={() => {
-                  this.handlechat({user}, this.senderId);
-                }}>
+              <TouchableOpacity onPress={() => alert}>
                 <View
                   style={{
                     flexDirection: 'row',
@@ -164,7 +109,7 @@ state = {
                   }}>
                   <View style={{marginRight: 40}}>
                     <Image
-                      source={{uri: user?.photoURL}}
+                      source={{uri: chat.recieverId.user?.photoURL}}
                       style={{width: 50, height: 50, borderRadius: 100}}
                     />
                   </View>
@@ -176,11 +121,10 @@ state = {
                         color: '#000000',
                         marginBottom: 5,
                       }}>
-                      {user.firstName + " " + user.lastName}
+                      zz{chat.recieverId.user.firstName}
+                      {chat.recieverId.user.lastName}
                     </Text>
-                    <Text style={{fontSize: 16, color: '#000000'}}>
-                      {user.email}
-                    </Text>
+                    <Text style={{fontSize: 16, color: '#000000'}}></Text>
                   </View>
                   <Text
                     style={{
@@ -189,19 +133,16 @@ state = {
                       fontSize: 16,
                       fontWeight: 'bold',
                       color: '#000000',
-                    }}>
-                    {user.time}
-                  </Text>
+                    }}></Text>
                 </View>
               </TouchableOpacity>
             </View>
-          ))}
+          ))} */}
         </View>
       </ScrollView>
     );
   }
 }
-
 export default MessagesScreen;
 
 
