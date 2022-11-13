@@ -1,49 +1,103 @@
-import {firebase, collectionGroup} from '@react-native-firebase/firestore';
 import React, {Component} from 'react';
-import {View, Text, TouchableOpacity, Image} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
+import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
+import {firebase} from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+class ContactScreen extends Component {
+  state = {
+    users: [],
+  };
+  handlechat = (user1, user2) => {
+    firebase
+      .firestore()
+      .collection('chatroom')
+      //.where(recieverId && senderId, '!=', recieverId && senderId)
 
-function ContactScreen() {
-  var citiesRef = firebase.firestore().collection('cities');
-  var messages = firebase
-    .firestore()
-    .collectionGroup('messages')
-    //.where('type', '==', 'museum');
-  messages.get().then(querySnapshot => {
-    querySnapshot.forEach(doc => {
-      console.log(doc.id, ' => ', doc.data());
-    });
-  });
-  var City = firebase
-    .firestore()
-    .collection('chatroom')
-    //.where('capital', '==', true)
-    .get()
-    .then(querySnapshot => {
-      querySnapshot.forEach(doc => {
-        // doc.data() is never undefined for query doc snapshots
-        console.log(doc.id, ' => ', doc.data());
+      .add({
+        participantId: {
+          user1,
+          user2,
+        },
+      })
+      .then(docRef => {
+        const docid = docRef.id;
+        // this.props.navigation.navigate('Chat', {recieverId, docid});
+
+        this.props.navigation.navigate('Chat', {docid});
+        console.log(docRef.id);
+        console.log('Chat Room Created');
+      })
+      .catch(error => {
+        console.error('Error adding document: ', error);
       });
-    })
-    .catch(error => {
-      console.log('Error getting documents: ', error);
-    });
-  return (
-    <ScrollView style={{backgroundColor: '#4F3B70'}}>
-      <View style={{padding: 20}}>
-        <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold'}}>
-          My Chatlists
-        </Text>
-      </View>
-      {/* <View
+  };
+  constructor(props) {
+    super(props);
+    //this.getUser();
+    //this.state = {text: ' '};
+
+    // this.subscriber = firebase
+    //   .firestore()
+    //   .collection('users')
+    //   .onSnapshot(docs => {
+    //     let users = [];
+    //     docs.forEach(doc => {
+    //       users.push(doc.data());
+    //     });
+    //     this.setState({users});
+    //     console.log(users);
+    //   });
+    //  this.cities= firebase.firestore().collection("cities").doc("LA").set({
+    //     name: "Los Angeles",
+    //     state: "CA",
+    //     country: "USA"
+    // })
+    // .then(() => {
+    //     console.log("Document successfully written!");
+    // })
+    // .catch((error) => {
+    //     console.error("Error writing document: ", error);
+    // });
+
+    this.senderId = auth().currentUser.uid;
+    let sender = this.senderId;
+    console.log(sender);
+
+    this.userId = firebase
+      .firestore()
+      .collection('users')
+      .get()
+      .then(querySnapshot => {
+        let users = [];
+        querySnapshot.forEach(documentSnapshot => {
+          let user = documentSnapshot.data();
+          user.id = documentSnapshot.id;
+          users.push(user);
+          //console.log('User data: ', users);
+        });
+        this.setState({users: users});
+      });
+  }
+  render() {
+    const {linkTo} = this.props;
+    return (
+      <ScrollView style={{backgroundColor: '#4F3B70'}}>
+        <View style={{padding: 20}}>
+          <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold'}}>
+            Contacts
+          </Text>
+        </View>
+        <View
           style={{
             backgroundColor: '#ffffff',
             borderTopRightRadius: 40,
             borderTopLeftRadius: 40,
           }}>
-          {this.state.chats.map((chatroom, index) => (
+          {this.state.users.map((user, index) => (
             <View key={index} style={{marginTop: 20}}>
-              <TouchableOpacity onPress={() => alert}>
+              <TouchableOpacity
+                onPress={() => {
+                  this.handlechat(user.id, this.senderId);
+                }}>
                 <View
                   style={{
                     flexDirection: 'row',
@@ -53,7 +107,7 @@ function ContactScreen() {
                   }}>
                   <View style={{marginRight: 40}}>
                     <Image
-                      source={{uri: chatroom?.photoURL}}
+                      source={{uri: user?.photoURL}}
                       style={{width: 50, height: 50, borderRadius: 100}}
                     />
                   </View>
@@ -65,10 +119,11 @@ function ContactScreen() {
                         color: '#000000',
                         marginBottom: 5,
                       }}>
-                      {chatroom.recieverId}
+                      {user.firstName}
+                      {user.lastName}
                     </Text>
                     <Text style={{fontSize: 16, color: '#000000'}}>
-                      {chatroom.email}
+                      {user.email}
                     </Text>
                   </View>
                   <Text
@@ -79,14 +134,16 @@ function ContactScreen() {
                       fontWeight: 'bold',
                       color: '#000000',
                     }}>
-                    {chatroom.time}
+                    {user.time}
                   </Text>
                 </View>
               </TouchableOpacity>
             </View>
           ))}
-        </View> */}
-    </ScrollView>
-  );
+        </View>
+      </ScrollView>
+    );
+  }
 }
+
 export default ContactScreen;

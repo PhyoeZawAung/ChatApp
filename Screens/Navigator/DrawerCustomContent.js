@@ -74,6 +74,7 @@ const CustomContent = props => {
                     props.navigation.navigate('Profile')
                   }></DrawerItem>
                 <DrawerItem
+                initializing={true}
                   icon={({color, size}) => (
                     <Icon name="people" color={color} size={size} />
                   )}
