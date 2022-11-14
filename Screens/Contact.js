@@ -14,6 +14,8 @@ class ContactScreen extends Component {
       //.where('participantId.user1&&participantId.user2', '!=', user1 && user2)
       .add({
         participantId: [user1, user2],
+        latestTime: '',
+        latestMessages: '',
       })
       .then(docRef => {
         const docid = docRef.id;
