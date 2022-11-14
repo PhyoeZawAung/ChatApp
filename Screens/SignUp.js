@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch, Provider } from 'react-redux';
-import { SetUser } from '../Redux/User/UserAction';
+import React, {useState} from 'react';
+import {useSelector, useDispatch, Provider} from 'react-redux';
+import {SetUser} from '../Redux/User/UserAction';
 import {
   View,
   Text,
@@ -10,14 +10,21 @@ import {
   ToastAndroid,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import { Formik } from 'formik';
+import {Formik} from 'formik';
 import * as yup from 'yup';
-import firestore from "@react-native-firebase/firestore";
+import firestore from '@react-native-firebase/firestore';
+import {Dialog} from '@rneui/base';
 
-const SignUpScreen = ({ navigation }) => {
-
+const SignUpScreen = ({navigation}) => {
+  const [loading, setLoading] = useState(false);
   const [showhide, setShowHide] = useState(true);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [showError, setShowError] = useState(false);
+
   const dispatch = useDispatch();
+  const toggleError = () => {
+    setShowError(!showError);
+  };
   const setUserName = (firstName, lastName) => {
     dispatch(
       SetUser({
@@ -26,7 +33,7 @@ const SignUpScreen = ({ navigation }) => {
         nameAdded: true,
       }),
     );
-    console.log("user name" + firstName + lastName);
+    console.log('user name' + firstName + lastName);
   };
 
   const Show = showhide => {
@@ -36,33 +43,36 @@ const SignUpScreen = ({ navigation }) => {
   };
 
   const signup = async (email, password, firstName, lastName) => {
+    setLoading(true);
     try {
       await auth()
         .createUserWithEmailAndPassword(email, password)
-        .then((cred) => {
+        .then(cred => {
           firestore()
-            .collection("users")
+            .collection('users')
             .doc(cred.user.uid)
             .set({
               firstName,
               lastName,
               email,
               password,
-            });
+            })
+            .then(() => setLoading(false));
         });
     } catch (error) {
-
       if (error.code === 'auth/email-already-in-use') {
         console.log('That email address is already in use!');
-        alert('That email address is already in use! , try login');
-        navigation.navigate("Login");
+        setLoading(false);
+        setErrorMsg('Email Address is already in use');
+        toggleError();
       }
 
       if (error.code === 'auth/invalid-email') {
         console.log('That email address is invalid!');
+        setLoading(false);
+        setErrorMsg('That email address is invalid!');
+        toggleError();
       }
-
-      console.error(error);
     }
   };
   return (
@@ -84,7 +94,7 @@ const SignUpScreen = ({ navigation }) => {
             mail: yup.string().email('Invalid Email').required('Enter Email'),
             password: yup
               .string()
-              .min(8, ({ min }) => `password must be ${min} characters`)
+              .min(8, ({min}) => `password must be ${min} characters`)
               .matches(/[0-9]/, 'Must Contain number(0 to 9)')
 
               .required('Enter Password'),
@@ -98,7 +108,12 @@ const SignUpScreen = ({ navigation }) => {
             setTimeout(() => {
               console.log(JSON.stringify(values));
               setUserName(values.firstName, values.lastName);
-              signup(values.mail, values.password, values.firstName, values.lastName);
+              signup(
+                values.mail,
+                values.password,
+                values.firstName,
+                values.lastName,
+              );
               formikAction.setSubmitting(false);
             }, 500);
           }}>
@@ -180,13 +195,44 @@ const SignUpScreen = ({ navigation }) => {
                   console.log('press');
                   props.handleSubmit();
                 }}>
-                <Text style={{ color: '#fff', fontWeight: 'bold' }}>
+                <Text style={{color: '#fff', fontWeight: 'bold'}}>
                   Register
                 </Text>
               </Pressable>
             </View>
           )}
         </Formik>
+        <Dialog isVisible={loading} overlayStyle={{backgroundColor: '#fff'}}>
+          <Dialog.Loading />
+        </Dialog>
+        <Dialog
+          isVisible={showError}
+          overlayStyle={{backgroundColor: '#fff'}}
+          onBackdropPress={toggleError}>
+          <Dialog.Title title={errorMsg} />
+          <Dialog.Actions>
+            <Pressable
+              style={styles.button}
+              onPress={() => {
+                navigation.navigate('Login');
+                toggleError();
+              }}>
+              <Text style={{color: '#fff', fontWeight: 'bold'}}>
+                Try login
+              </Text>
+            </Pressable>
+            <Pressable
+              style={styles.button}
+              onPress={() => {
+                navigation.navigate('Forgot');
+                toggleError();
+              }}>
+              <Text style={{color: '#fff', fontWeight: 'bold'}}>
+                Forgot password
+              </Text>
+            </Pressable>
+          </Dialog.Actions>
+        </Dialog>
       </View>
     </View>
   );

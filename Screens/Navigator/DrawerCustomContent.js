@@ -6,20 +6,45 @@ import {Provider, useSelector} from 'react-redux';
 import {Icon} from '@rneui/base';
 import store from '../../Redux/stroe';
 import {TEST_ID} from 'react-native-gifted-chat';
-
+import firestore from '@react-native-firebase/firestore';
+import { Avatar } from '@rneui/base';
 const CustomContent = props => {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
+  
   const firstname = useSelector(store => store.firstName);
   const lastName = useSelector(store => store.lastName);
   // Handle user state changes
   useEffect(() => {
-    const user = auth().currentUser;
-    if (user != null) {
-      setUser(user);
-      console.log(JSON.stringify(user));
-    }
+    //const user = auth().currentUser;
+    //if (user != null) {
+    //  setUser(user);
+    //  console.log(JSON.stringify(user));
+    //}
+    getUser( auth().currentUser.uid);
   }, []);
+
+  const getUser = (userId) => {
+    if (userId != null) {
+      firestore()
+      .collection('users')
+      .doc(userId)
+      .onSnapshot(documentSnapshot => {
+        console.log('User exists: ', documentSnapshot.exists);
+
+        if (documentSnapshot.exists) {
+          
+          setUser(documentSnapshot.data());
+          
+          
+          console.log('User data: ', user);
+        
+        }
+      });
+    }
+    
+  };
+
   const SignOut = () => {
     auth()
       .signOut()
@@ -33,10 +58,26 @@ const CustomContent = props => {
       {user ? (
         <View style={{flex: 1, backgroundColor: '#4F3B70'}}>
           <View style={{alignItems: 'center', paddingTop: 20}}>
-            <Image
-              source={{uri: user.photoURL}}
-              style={{width: 100, height: 100, borderRadius: 100}}
-            />
+           
+            {
+              typeof(user.photoURL) === "undefined" ? (
+                <Avatar
+                size={100}
+                rounded
+                  title={user.firstName[0] + user.lastName[0]}
+                containerStyle={{ backgroundColor: 'grey' }}>
+                </Avatar>
+                
+              ) : (
+                <Avatar
+                size={100}
+                rounded
+                source={{ uri: user.photoURL }}
+                containerStyle={{ backgroundColor: 'grey' }}>
+                </Avatar>
+              )
+                
+            }
             <Text
               style={{
                 color: '#fff',
@@ -44,12 +85,9 @@ const CustomContent = props => {
                 fontWeight: 'bold',
                 fontSize: 23,
               }}>
-              {user.displayName}
+              {user.firstName +" " + user.lastName}
             </Text>
-            <View style={{flexDirection: 'row'}}>
-              <Text>{firstname}</Text>
-              <Text>{lastName}</Text>
-            </View>
+           
           </View>
 
           <DrawerContentScrollView {...props}>
@@ -74,7 +112,7 @@ const CustomContent = props => {
                     props.navigation.navigate('Profile')
                   }></DrawerItem>
                 <DrawerItem
-                initializing={true}
+                  initializing={true}
                   icon={({color, size}) => (
                     <Icon name="people" color={color} size={size} />
                   )}

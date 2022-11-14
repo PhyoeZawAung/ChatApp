@@ -95,6 +95,7 @@ const MeScreen = ({ navigation }) => {
   //this function update the name of user
 
   const UpdateName = async (userFirstName, userLastName) => {
+    setLoading(true);
     let name = userFirstName + " " + userLastName;
     await auth().currentUser.updateProfile({ displayName: name }).then(
       () => {
@@ -112,7 +113,9 @@ const MeScreen = ({ navigation }) => {
               ToastAndroid.BOTTOM,
          
             )
+            setLoading(false);
           }
+          
         )
       }
     ).catch((error) => {
@@ -123,6 +126,7 @@ const MeScreen = ({ navigation }) => {
     console.log('Name Updated');
   };
   const UpdateEmail = async (Email) => {
+    setLoading(true);
     await auth().signInWithEmailAndPassword(auth().currentUser.email, password).then(() => {
       console.log("login")
       auth().currentUser.updateEmail(Email).then(() => {
@@ -134,6 +138,7 @@ const MeScreen = ({ navigation }) => {
             ToastAndroid.SHORT,
             ToastAndroid.BOTTOM,
           )
+          setLoading(false);
         })
       }).catch(error => alert(error));
     }).catch(error => alert(error));
@@ -194,7 +199,7 @@ const MeScreen = ({ navigation }) => {
   };
   const SettingProfile = async (firstname, lastname, email, photo, updateFirstName, updateLastName, updateEmail, updatePhoto) => {
 
-    if (firstname != null && updateFirstName != null) {
+    if ((firstname != null && updateFirstName != null) || (lastname != null && updateLastName != null)) {
       if (firstname != "") {
         UpdateName(firstname, lastname)
       }
@@ -240,7 +245,7 @@ const MeScreen = ({ navigation }) => {
         <Avatar
           size={100}
           rounded
-          title="PF"
+          title={userFirstName?.[0]+userLastName?.[0]}
           containerStyle={{ backgroundColor: 'grey' }}>
           <Avatar.Accessory
             size={40}
@@ -381,6 +386,7 @@ const MeScreen = ({ navigation }) => {
 
       <Pressable style={styles.button}
         onPress={() => {
+          console.log("Press save")
           SettingProfile(userFirstName, userLastName, userEmail, userPhoto, updateUserFirstName, updateUserLastName, updateUserEmail, updateUserPhoto);
         }}>
         <Text style={{ color: "#fff", fontWeight: 'bold' }}>Save</Text>
