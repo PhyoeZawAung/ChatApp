@@ -9,6 +9,9 @@ class MessagesScreen extends Component {
     chats: [],
     messages: [],
   };
+  handlechat = docid => {
+    this.props.navigation.navigate('Chat', {docid});
+  };
   constructor(props) {
     super(props);
     this.chatroom = firebase
@@ -62,9 +65,9 @@ class MessagesScreen extends Component {
             borderTopRightRadius: 40,
             borderTopLeftRadius: 40,
           }}>
-          {/* {this.state.chats.map((chat, index) => (
+          {this.state.chats.map((chat, index) => (
             <View key={index} style={{marginTop: 20}}>
-              <TouchableOpacity onPress={() => alert}>
+              <TouchableOpacity onPress={() => this.handlechat(chat.id)}>
                 <View
                   style={{
                     flexDirection: 'row',
@@ -74,7 +77,7 @@ class MessagesScreen extends Component {
                   }}>
                   <View style={{marginRight: 40}}>
                     <Image
-                      source={{uri: chat.recieverId.user?.photoURL}}
+                      source={require('../../images/default_image.png')}
                       style={{width: 50, height: 50, borderRadius: 100}}
                     />
                   </View>
@@ -86,8 +89,7 @@ class MessagesScreen extends Component {
                         color: '#000000',
                         marginBottom: 5,
                       }}>
-                      zz{chat.recieverId.user.firstName}
-                      {chat.recieverId.user.lastName}
+                      {chat.id}
                     </Text>
                     <Text style={{fontSize: 16, color: '#000000'}}></Text>
                   </View>
@@ -102,7 +104,7 @@ class MessagesScreen extends Component {
                 </View>
               </TouchableOpacity>
             </View>
-          ))} */}
+          ))}
         </View>
       </ScrollView>
     );
