@@ -21,16 +21,26 @@ const LoginScreen = ({navigation}) => {
     } else return true;
   };
   const signIn = async (email, password) => {
-    setLoading(true);
-    console.log('Enter Sign process');
-    if (email == "" || password == "") {
+   
+    if (email == "") {
       ToastAndroid.showWithGravity(
-        'Invalid Email',
+        'Emter Email',
         ToastAndroid.SHORT,
         ToastAndroid.BOTTOM,
       );
+      return false;
+    }
+    if (password == '') {
+      ToastAndroid.showWithGravity(
+        'Emter Password',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      );
+      return false;
     }
     if (email != '' && password != '') {
+      setLoading(true);
+      console.log('Enter Sign process');
       await auth()
         .signInWithEmailAndPassword(email, password)
         .then(() => {

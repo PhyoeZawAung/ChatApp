@@ -211,19 +211,26 @@ const SignUpScreen = ({navigation}) => {
           onBackdropPress={toggleError}>
           <Dialog.Title title={errorMsg} />
           <Dialog.Actions>
-            <View style={{justifyContent: 'flex-start', width: '100%'}}>
-              <Dialog.Button
-                title="Try Login"
-                onPress={() => {
-                  navigation.navigate('Login');
-                }}></Dialog.Button>
-
-              <Dialog.Button
-                title="Forgot Password"
-                onPress={() => {
-                  navigation.navigate('Forgot');
-                }}></Dialog.Button>
-            </View>
+            <Pressable
+              style={styles.button}
+              onPress={() => {
+                navigation.navigate('Login');
+                toggleError();
+              }}>
+              <Text style={{color: '#fff', fontWeight: 'bold'}}>
+                Try login
+              </Text>
+            </Pressable>
+            <Pressable
+              style={styles.button}
+              onPress={() => {
+                navigation.navigate('Forgot');
+                toggleError();
+              }}>
+              <Text style={{color: '#fff', fontWeight: 'bold'}}>
+                Forgot password
+              </Text>
+            </Pressable>
           </Dialog.Actions>
         </Dialog>
       </View>
