@@ -28,8 +28,9 @@ class MessagesScreen extends Component {
           console.log(doc.id, ' => ', doc.data());
           let chatdetail = doc.data();
           chatdetail.id = doc.id;
+          chatdetail.latestTime = doc.data().latestTime.toDate();
           chats.push(chatdetail);
-          //console.log(chats);
+          console.log(chats);
         });
         this.setState({chats: chats});
         //console.log(chats);
@@ -37,7 +38,6 @@ class MessagesScreen extends Component {
       .catch(error => {
         console.log('Error getting documents: ', error);
       });
-
     //messages
     var messages = firebase.firestore().collectionGroup('messages');
     //.where('type', '==', 'museum');
@@ -91,7 +91,9 @@ class MessagesScreen extends Component {
                       }}>
                       {chat.id}
                     </Text>
-                    <Text style={{fontSize: 16, color: '#000000'}}></Text>
+                    <Text style={{fontSize: 16, color: '#000000'}}>
+                      {chat.latestMessages}
+                    </Text>
                   </View>
                   <Text
                     style={{
@@ -100,7 +102,8 @@ class MessagesScreen extends Component {
                       fontSize: 16,
                       fontWeight: 'bold',
                       color: '#000000',
-                    }}></Text>
+                    }}>.
+                  </Text>
                 </View>
               </TouchableOpacity>
             </View>
