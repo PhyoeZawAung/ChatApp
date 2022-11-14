@@ -5,40 +5,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
 
 class MessagesScreen extends Component {
-
-
-/*
-state = { 
-    participantsId: [], 
-    users: [],
-  };
-  constructor(props) {
-    super(props);
-    this.chatroom = firebase
-      .firestore()
-      .collection('chatroom')
-      .set(
-        this.participantsId,
-      ).then(() => {
-        const docId=docRef.id
-        this.props.navigation.navigate('Chat', {recieverId, docId});
-        console.log(docRef.id);
-        console.log('Chat Room Created');
-      })
-      .catch(error => {
-        console.log('Error getting documents: ', error);
-      });
-
-  }catch(error){
-    console.log(error);
-  }
- }
-*/
-
-
-
-
-
+  
   state = {
     chats: [],
     messages: [],

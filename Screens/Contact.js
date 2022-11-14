@@ -17,7 +17,7 @@ class ContactScreen extends Component {
       })
       .then(docRef => {
         const docid = docRef.id;
-        // this.props.navigation.navigate('Chat', {recieverId, docid});
+        //this.props.navigation.navigate('Chat', {recieverId, docid});
 
         this.props.navigation.navigate('Chat', {docid});
         console.log(docRef.id);
@@ -67,10 +67,12 @@ class ContactScreen extends Component {
       .then(querySnapshot => {
         let users = [];
         querySnapshot.forEach(documentSnapshot => {
-          let user = documentSnapshot.data();
-          user.id = documentSnapshot.id;
-          users.push(user);
-          console.log('User data: ', users);
+          if( auth().currentUser.uid != documentSnapshot.id ){
+            let user = documentSnapshot.data();
+            user.id = documentSnapshot.id;
+            users.push(user);
+            console.log('User data: ', users);
+          }
         });
         this.setState({users: users});
       });
@@ -124,7 +126,6 @@ class ContactScreen extends Component {
                       marginBottom: 5,
                     }}>
                     {user.firstName + " " + user.lastName}
-                   
                   </Text>
                 </View>
               </View>
