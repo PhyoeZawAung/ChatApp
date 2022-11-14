@@ -111,6 +111,7 @@ import storage from '@react-native-firebase/storage';
 import { useSelector } from 'react-redux';
 import { StackActions } from '@react-navigation/native';
 import firestore from "@react-native-firebase/firestore";
+import { useEffect } from 'react';
 
 const ImageUploader = ({ navigation }) => {
   const [choice, setChoice] = useState(false);
@@ -250,7 +251,7 @@ const ImageUploader = ({ navigation }) => {
             <Avatar
               size={100}
               rounded
-              title="PF"
+              title={firstName[0] + lastName [0]}
               containerStyle={{ backgroundColor: 'grey' }}>
               <Avatar.Accessory
                 size={35}

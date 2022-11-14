@@ -14,35 +14,52 @@ const LoginScreen = ({navigation}) => {
   const [showhide, setShowHide] = useState(true);
   const [dialog, setDialog] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const Show = showhide => {
     if (showhide == true) {
       return false;
     } else return true;
   };
   const signIn = async (email, password) => {
-    console.log('Enter Sign process');
-    if (email == "" || password == "") {
+   
+    if (email == "") {
       ToastAndroid.showWithGravity(
-        'Invalid Email',
+        'Emter Email',
         ToastAndroid.SHORT,
         ToastAndroid.BOTTOM,
       );
+      return false;
+    }
+    if (password == '') {
+      ToastAndroid.showWithGravity(
+        'Emter Password',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      );
+      return false;
     }
     if (email != '' && password != '') {
+      setLoading(true);
+      console.log('Enter Sign process');
       await auth()
         .signInWithEmailAndPassword(email, password)
         .then(() => {
           console.log('User account created & signed in!');
+          setLoading(false);
           //alert('signed in!');
         })
         .catch(error => {
-          if (error.code === 'auth/email-already-in-use') {
-            console.log('That email address is already in use!');
+          if (error.code === 'auth/user-not-found') {
+            console.log('User Not Found');
+            setError("User Not found");
+            setLoading(false);
+            toggleDialog();
           }
 
           if (error.code === 'auth/invalid-email') {
             console.log('That email address is invalid!');
             setError('That email address is invalid!');
+            setLoading(false);
             toggleDialog();
           }
           if (error.code === 'auth/wrong-password') {
@@ -52,11 +69,13 @@ const LoginScreen = ({navigation}) => {
               ToastAndroid.LONG,
               ToastAndroid.BOTTOM,
             );
+            setLoading(false);
             setError('Wrong password');
             toggleDialog();
           }
           if (error.code === 'auth/too-many-requests') {
             setError('Too many Request wait for a minute and try again');
+            setLoading(false);
             toggleDialog();
           }
           console.log(error);
@@ -137,7 +156,10 @@ const LoginScreen = ({navigation}) => {
                 navigation.navigate('Forgot');
               }}
             />
-          </Dialog>
+        </Dialog>
+        <Dialog isVisible={loading} overlayStyle={{backgroundColor:"#fff"}}>
+          <Dialog.Loading/>
+        </Dialog>
       </View>
       <View>
             <View style={styles.signup}>

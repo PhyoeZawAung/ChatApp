@@ -1,19 +1,34 @@
 import React, {useState} from 'react';
 
-import {View, Text, TextInput, Pressable, StyleSheet} from 'react-native';
+import {View, Text, TextInput, Pressable, StyleSheet, ToastAndroid} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {Dialog} from '@rneui/base';
 const ForgotScreen = ({navigation}) => {
   const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const Forgot = async email => {
-    await auth()
+    
+    if (email == "") {
+      ToastAndroid.showWithGravity(
+        "Enter Mail",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      )
+      return false;
+    }
+      setLoading(true);
+      await auth()
       .sendPasswordResetEmail(email)
       .then(() => {
         setVisible(true);
+        setLoading(false);
       })
       .catch(error => {
+        setLoading(false);
         alert(JSON.stringify(error));
       });
+    
+    
   };
   const [email, setEmail] = useState('');
   return (
@@ -52,6 +67,9 @@ const ForgotScreen = ({navigation}) => {
                 go to login
               </Text>
             </Pressable>
+          </Dialog>
+          <Dialog isVisible={loading} overlayStyle={{ backgroundColor: "#fff" }}>
+            <Dialog.Loading/>
           </Dialog>
         </View>
       </View>
