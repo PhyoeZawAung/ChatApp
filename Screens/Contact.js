@@ -8,8 +8,10 @@ class ContactScreen extends Component {
     empty: true,
   };
   handlechat = (user1, user2) => {
-    const part = firebase.firestore('chatroom').get();
-    console.log(part);
+
+    const part = firebase.firestore().collection('chatroom').get();
+    console.log(part) 
+
     firebase
       .firestore()
       .collection('chatroom')
@@ -32,6 +34,7 @@ class ContactScreen extends Component {
       .catch(error => {
         console.error('Error adding document: ', error);
       });
+    
   };
   constructor(props) {
     super(props);
@@ -128,8 +131,8 @@ class ContactScreen extends Component {
                       color: '#000000',
                       marginBottom: 5,
                     }}>
-                    {user.firstName}
-                    {user.lastName}
+                    {user.firstName + " " + user.lastName}
+                   
                   </Text>
                 </View>
               </View>

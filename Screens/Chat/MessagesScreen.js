@@ -141,6 +141,7 @@ state = {
         </View>
       </ScrollView>
     );
+    
   }
 }
 export default MessagesScreen;
