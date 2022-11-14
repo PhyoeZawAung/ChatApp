@@ -5,23 +5,15 @@ import auth from '@react-native-firebase/auth';
 class ContactScreen extends Component {
   state = {
     users: [],
-    empty: true,
   };
   handlechat = (user1, user2) => {
-
-    const part = firebase.firestore().collection('chatroom').get();
-    console.log(part) 
-
     firebase
       .firestore()
       .collection('chatroom')
       //.where(recieverId && senderId, '!=', recieverId && senderId)
       //.where('participantId.user1&&participantId.user2', '!=', user1 && user2)
       .add({
-        participantId: {
-          user1,
-          user2,
-        },
+        participantId: [user1, user2],
       })
       .then(docRef => {
         const docid = docRef.id;
@@ -78,7 +70,7 @@ class ContactScreen extends Component {
           let user = documentSnapshot.data();
           user.id = documentSnapshot.id;
           users.push(user);
-          //console.log('User data: ', users);
+          console.log('User data: ', users);
         });
         this.setState({users: users});
       });

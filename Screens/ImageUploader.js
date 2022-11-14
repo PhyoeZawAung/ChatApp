@@ -188,7 +188,7 @@ const ImageUploader = ({ navigation }) => {
         try {
           const id = auth().currentUser.uid;
           const docRef = firestore().collection('users').doc(id);
-          docRef.update({photoUrl: url})
+          docRef.update({photoURL: url})
           console.log("url added");
         } catch (error) {
           console.log(error);
