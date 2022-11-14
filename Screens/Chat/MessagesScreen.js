@@ -14,7 +14,8 @@ class MessagesScreen extends Component {
     this.chatroom = firebase
       .firestore()
       .collection('chatroom')
-      .where('participantId.user2', '==', auth().currentUser.uid)
+      .where('participantId', 'array-contains', auth().currentUser.uid)
+      //.where('participantId.user1', '==', auth().currentUser.uid)
       //.where('participantId.user1', '==', auth().currentUser.uid)
       .get()
       .then(querySnapshot => {
@@ -28,12 +29,12 @@ class MessagesScreen extends Component {
           //console.log(chats);
         });
         this.setState({chats: chats});
-        console.log(chats);
+        //console.log(chats);
       })
       .catch(error => {
         console.log('Error getting documents: ', error);
       });
-      
+
     //messages
     var messages = firebase.firestore().collectionGroup('messages');
     //.where('type', '==', 'museum');
