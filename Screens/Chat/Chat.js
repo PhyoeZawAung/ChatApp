@@ -76,6 +76,17 @@ function ChatScreen({navigation}) {
       .then(() => {
         console.log('User added!');
       });
+    firebase
+      .firestore()
+      .collection('chatroom')
+      .doc(route.params.docid)
+      .update({
+        latestMessages: text,
+        latestTime: createdAt,
+      })
+      .then(() => {
+        console.log('latest added');
+      });
   }, []);
   return (
     <GiftedChat

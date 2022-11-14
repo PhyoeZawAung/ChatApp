@@ -62,8 +62,9 @@ state = {
           console.log(doc.id, ' => ', doc.data());
           let chatdetail = doc.data();
           chatdetail.id = doc.id;
+          chatdetail.latestTime = doc.data().latestTime.toDate();
           chats.push(chatdetail);
-          //console.log(chats);
+          console.log(chats);
         });
         this.setState({chats: chats});
         //console.log(chats);
@@ -71,7 +72,6 @@ state = {
       .catch(error => {
         console.log('Error getting documents: ', error);
       });
-
     //messages
     var messages = firebase.firestore().collectionGroup('messages');
     //.where('type', '==', 'museum');
@@ -127,7 +127,9 @@ state = {
                       }}>
                       {chat.id}
                     </Text>
-                    <Text style={{fontSize: 16, color: '#000000'}}></Text>
+                    <Text style={{fontSize: 16, color: '#000000'}}>
+                      {chat.latestMessages}
+                    </Text>
                   </View>
                   <Text
                     style={{
@@ -136,7 +138,8 @@ state = {
                       fontSize: 16,
                       fontWeight: 'bold',
                       color: '#000000',
-                    }}></Text>
+                    }}>.
+                  </Text>
                 </View>
               </TouchableOpacity>
             </View>
