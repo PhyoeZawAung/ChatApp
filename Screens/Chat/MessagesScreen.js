@@ -1,5 +1,5 @@
 import {firebase, collectionGroup} from '@react-native-firebase/firestore';
-import React, {Component, useState} from 'react';
+import React, {Component} from 'react';
 import {View, Text, TouchableOpacity, Image} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
@@ -25,10 +25,13 @@ class MessagesScreen extends Component {
         let chats = [];
         querySnapshot.forEach(doc => {
           // doc.data() is never undefined for query doc snapshots
-          console.log(doc.id, ' => ', doc.data());
+          //console.log(doc.id, ' => ', doc.data());
           let chatdetail = doc.data();
           chatdetail.id = doc.id;
-          chatdetail.latestTime = doc.data().latestTime.toDate();
+          chatdetail.latestTime =
+            doc.data().latestTime.toDate().getHours() +
+            ':' +
+            doc.data().latestTime.toDate().getMinutes();
           chats.push(chatdetail);
           console.log(chats);
         });
@@ -102,7 +105,8 @@ class MessagesScreen extends Component {
                       fontSize: 16,
                       fontWeight: 'bold',
                       color: '#000000',
-                    }}>.
+                    }}>
+                    {chat.latestTime}
                   </Text>
                 </View>
               </TouchableOpacity>
