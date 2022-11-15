@@ -6,6 +6,7 @@ import {useEffect, useState, useCallback} from 'react';
 import {View, Text} from 'react-native';
 import {GiftedChat} from 'react-native-gifted-chat';
 
+
 function ChatScreen({navigation}) {
   const chatroomId = firebase
     .firestore()

@@ -1,17 +1,19 @@
-import React, {Component} from 'react';
-import {View, Text, Image, TouchableOpacity, ScrollView} from 'react-native';
-import {firebase} from '@react-native-firebase/firestore';
+import React, { Component } from 'react';
+import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { firebase } from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+
 class ContactScreen extends Component {
   state = {
     users: [],
+    ids: [],
   };
+
+  
   handlechat = (user1, user2) => {
     firebase
       .firestore()
       .collection('chatroom')
-      //.where(recieverId && senderId, '!=', recieverId && senderId)
-      //.where('participantId.user1&&participantId.user2', '!=', user1 && user2)
       .add({
         participantId: [user1, user2],
         latestTime: '',
@@ -19,10 +21,9 @@ class ContactScreen extends Component {
       })
       .then(docRef => {
         const docid = docRef.id;
-        //this.props.navigation.navigate('Chat', {recieverId, docid});
-
         this.props.navigation.navigate('Chat', {docid});
-        console.log(docRef.id);
+
+        console.log("Chat Room ID: " ,docRef.id);
         console.log('Chat Room Created');
       })
       .catch(error => {
@@ -30,6 +31,50 @@ class ContactScreen extends Component {
       });
     
   };
+  
+/*
+  handlechat = (user1, user2) => {
+    //let userIds = [user1, user2];
+    firebase
+      .firestore()
+      .collection('chatroom')
+      .get()
+      .then(querySnapshot => {
+        let ids = [];
+        querySnapshot.forEach(documentSnapshot => {
+          ids = documentSnapshot.data().participantId
+        })
+        this.setState({ ids: ids });
+        console.log("userIds: ", ids);
+        
+        .then(docRef => {
+          if (ids != null) {
+            const docid = docRef.id;
+            this.props.navigation.navigate('Chat', { docid });
+            console.log("Shi pee Thrr");
+          } else {
+            firebase
+              .firestore()
+              .collection('chatroom')
+              .add({
+                participantId: [user1, user2],
+                latestTime: '',
+                latestMessages: '',
+              })
+              .then(docRef => {
+                const docid = docRef.id;
+                this.props.navigation.navigate('Chat', { docid });
+
+                console.log("Chat Room ID: ", docRef.id);
+                console.log('Chat Room Created');
+              })
+          }
+        })
+        
+      })
+
+  }
+*/
   constructor(props) {
     super(props);
     //this.getUser();
@@ -58,9 +103,9 @@ class ContactScreen extends Component {
     //     console.error("Error writing document: ", error);
     // });
 
+    //this.senderName = auth().currentUser.displayName;
     this.senderId = auth().currentUser.uid;
-    let sender = this.senderId;
-    console.log(sender);
+
 
     this.userId = firebase
       .firestore()
@@ -69,22 +114,30 @@ class ContactScreen extends Component {
       .then(querySnapshot => {
         let users = [];
         querySnapshot.forEach(documentSnapshot => {
-          if( auth().currentUser.uid != documentSnapshot.id ){
+          if (auth().currentUser.uid != documentSnapshot.id) {
             let user = documentSnapshot.data();
             user.id = documentSnapshot.id;
             users.push(user);
-            console.log('User data: ', users);
+            //console.log('User data: ', users);
           }
         });
-        this.setState({users: users});
+        this.setState({ users: users });
       });
   }
+
+  /*
+  componentDidMount() {
+    let userName = this.state.users.firstName+ " " + this.state.users.lastName;
+    this.setState({userName: userName});
+  }
+  */
+
   render() {
-    const {linkTo} = this.props;
+    const { linkTo } = this.props;
     return (
-      <ScrollView style={{backgroundColor: '#4F3B70'}}>
-        <View style={{padding: 20}}>
-          <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold'}}>
+      <ScrollView style={{ backgroundColor: '#4F3B70' }}>
+        <View style={{ padding: 20 }}>
+          <Text style={{ fontSize: 32, color: 'white', fontWeight: 'bold' }}>
             Contacts
           </Text>
         </View>
@@ -100,7 +153,7 @@ class ContactScreen extends Component {
             }}>
             <TouchableOpacity
               onPress={() => {
-                this.handlechat(user.id, this.senderId);
+                this.handlechat(user.id, this.senderId); // this.userName,  this.senderName);
               }}>
               <View
                 style={{
@@ -109,17 +162,17 @@ class ContactScreen extends Component {
                   paddingVertical: 20,
                   alignItems: 'center',
                 }}>
-                <View style={{marginRight: 40}}>
+                <View style={{ marginRight: 40 }}>
                   <Image
                     source={
                       user?.photoURL
-                        ? {uri: user?.photoURL}
+                        ? { uri: user?.photoURL }
                         : require('../images/default_image.png')
                     }
-                    style={{width: 50, height: 50, borderRadius: 100}}
+                    style={{ width: 50, height: 50, borderRadius: 100 }}
                   />
                 </View>
-                <View style={{flexDirection: 'column'}}>
+                <View style={{ flexDirection: 'column' }}>
                   <Text
                     style={{
                       fontSize: 16,

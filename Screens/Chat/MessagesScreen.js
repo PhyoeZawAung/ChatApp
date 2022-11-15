@@ -5,22 +5,43 @@ import {ScrollView} from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
 
 class MessagesScreen extends Component {
-  
+
   state = {
     chats: [],
     messages: [],
+    name: '',
   };
+
   handlechat = docid => {
     this.props.navigation.navigate('Chat', {docid});
   };
+
   constructor(props) {
     super(props);
+
+    this.nameId = firebase
+      .firestore()
+      .collection('chatroom')
+      .where('participantId', '!=', auth().currentUser.uid)
+      .get()
+
+    this.userName = firebase
+      .firestore()
+      .collection('users')
+      .where('id', '==', this.nameId) 
+      .onSnapshot (doc => {
+        //let firstName = doc.data().firstName
+        //let lastName = doc.data().lastName
+        //userName = firstName + " " + lastName
+        this.setState({   
+          name: doc.firstName+ " " + doc.lastName
+        })
+      }) 
+
     this.chatroom = firebase
       .firestore()
       .collection('chatroom')
-      .where('participantId', 'array-contains', auth().currentUser.uid)
-      //.where('participantId.user1', '==', auth().currentUser.uid)
-      //.where('participantId.user1', '==', auth().currentUser.uid)
+      .where('participantId', 'array-contains', auth().currentUser.uid) 
       .get()
       .then(querySnapshot => {
         let chats = [];
@@ -42,9 +63,9 @@ class MessagesScreen extends Component {
       .catch(error => {
         console.log('Error getting documents: ', error);
       });
-    //messages
+
     var messages = firebase.firestore().collectionGroup('messages');
-    //.where('type', '==', 'museum');
+    
     messages.get().then(querySnapshot => {
       let messages = [];
       querySnapshot.forEach(doc => {
@@ -54,8 +75,8 @@ class MessagesScreen extends Component {
       });
       this.setState({messages: messages});
     });
-  }
 
+  }
 
   render() {
     return (
@@ -95,7 +116,7 @@ class MessagesScreen extends Component {
                         color: '#000000',
                         marginBottom: 5,
                       }}>
-                      {chat.id}
+                      { this.state.name }
                     </Text>
                     <Text style={{fontSize: 16, color: '#000000'}}>
                       {chat.latestMessages}
