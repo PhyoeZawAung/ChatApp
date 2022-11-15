@@ -12,6 +12,7 @@ function ChatScreen({navigation}) {
     .get()
     .then(querySnapshot => {
       querySnapshot.forEach(documentSnapshot => {
+        console.log(documentSnapshot.data());
         let chatroom = documentSnapshot.data();
         chatroom.id = documentSnapshot.id;
       });
