@@ -121,6 +121,16 @@ const CustomContent = props => {
                   onPress={() =>
                     props.navigation.navigate('Contact')
                   }></DrawerItem>
+                  <DrawerItem
+                  initializing={true}
+                  icon={({color, size}) => (
+                    <Icon name="people" color={color} size={size} />
+                  )}
+                  label="My Group"
+                  inactiveTintColor="#fff"
+                  onPress={() =>
+                    props.navigation.navigate('Group')
+                  }></DrawerItem>
               </View>
 
               <DrawerItem

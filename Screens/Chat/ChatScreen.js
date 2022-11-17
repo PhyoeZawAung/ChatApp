@@ -1,54 +1,46 @@
-import React, {useLayoutEffect, useCallback, useEffect, useState} from 'react';
-import {View, Text, Button} from 'react-native';
-import {GiftedChat} from 'react-native-gifted-chat';
 import {firebase} from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import {launchImageLibrary} from 'react-native-image-picker';
-
+import {useRoute} from '@react-navigation/native';
+import {useLayoutEffect} from 'react';
+import {useEffect, useState, useCallback} from 'react';
+import {View, Text} from 'react-native';
+import {GiftedChat} from 'react-native-gifted-chat';
 function ChatScreen({navigation}) {
+  const chatroomId = firebase
+    .firestore()
+    .collection('group')
+    .get()
+    .then(querySnapshot => {
+      querySnapshot.forEach(documentSnapshot => {
+        console.log(documentSnapshot.data());
+        let chatroom = documentSnapshot.data();
+        chatroom.id = documentSnapshot.id;
+      });
+    });
+  const route = useRoute();
   // useEffect(() => {
   //   navigation.setOptions({
-  //     headerRight: () => (
-  //       <Button
-  //         onPress={() => {
-  //           selectImage();
-  //         }}
-  //         title="Image"
-  //         color="#000000"
-  //       />
+  //     title: '',
+  //     headerLeft: () => (
+  //       <View style={{flexDirection: 'row'}}>
+  //         <Text>Image</Text>
+  //         <Text> </Text>
+  //         <Text>{route.params.recieverId.user.firstName} </Text>
+  //         <Text>{route.params.recieverId.user.lastName} </Text>
+  //       </View>
   //     ),
   //   });
   // });
-  // const [image, setImage] = useState();
-  // const selectImage = async () => {
-  //   const result = await launchImageLibrary();
-  //   console.log(result);
-  //   setImage(result);
-  //   console.log('Image Url:::' + image);
-  // };
-  const user = firebase.auth().currentUser;
-  if (user !== null) {
-    const uid = user.id;
+  const sender = firebase.auth().currentUser;
+  if (sender !== null) {
+    const uid = sender.id;
   }
   const [messages, setMessages] = useState([]);
-  // useEffect(() => {
-  //   setMessages([
-  //     {
-  //       _id: 1,
-  //       text: 'Hello developer',
-  //       createdAt: new Date(),
-  //       user: {
-  //         _id: 2,
-  //         name: 'React Native',
-  //         avatar: 'https://placeimg.com/140/140/any',
-  //       },
-  //       image: 'https://facebook.github.io/react/img/logo_og.png',
-  //     },
-  //   ]);
-  // }, []);
   useLayoutEffect(() => {
     const Unsubscribe = firebase
       .firestore()
+      .collection('group')
+      .doc(route.params.docid)
       .collection('messages')
       .orderBy('createdAt', 'desc')
       .onSnapshot(snapshot =>
@@ -72,6 +64,8 @@ function ChatScreen({navigation}) {
     const {_id, createdAt, text, user} = messages[0];
     firebase
       .firestore()
+      .collection('group')
+      .doc(route.params.docid)
       .collection('messages')
       .add({
         _id,
@@ -82,25 +76,27 @@ function ChatScreen({navigation}) {
       .then(() => {
         console.log('User added!');
       });
+    firebase
+      .firestore()
+      .collection('group')
+      .doc(route.params.docid)
+      .update({
+        latestMessages: text,
+        latestTime: createdAt,
+      })
+      .then(() => {
+        console.log('latest added');
+      });
   }, []);
-
-  // useLayoutEffect(() => {
-  //   navigation.setOptions({
-  //     headerleft: () => {
-  //       <View style={{marginLeft: 20}}>
-  //         <Text>User's Profile</Text>
-  //         <Text>User's name</Text>
-  //       </View>;
-  //     },
-  //   });
-  // });
   return (
     <GiftedChat
       messages={messages}
       showAvatarForEveryMessage={true}
       onSend={messages => onSend(messages)}
       user={{
-        _id: auth().currentUser.email,
+        _id: auth().currentUser.uid,
+        name: auth().currentUser.displayName,
+        avatar: auth().currentUser.photoURL,
       }}
     />
   );
