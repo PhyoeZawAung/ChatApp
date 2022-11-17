@@ -162,9 +162,6 @@ import { FlatList } from 'react-native-gesture-handler';
 
 const MessagesScreen = ({ navigation }) => {
 
-  //const [listItem, setListItem] = useState([]);
-  //const [user, setUser] = useState({});
-  const [chat, setChat] = useState([]);
   const [chatData, setChatData] = useState({})
   const [chatDataArray, setChatDataArray] = useState([]);
 
@@ -172,21 +169,20 @@ const MessagesScreen = ({ navigation }) => {
     navigation.navigate('Chat', { docid });
   }
 
+  async function fromChat() {
 
-  const fromChat = async () => {
-    //let chatDataArray = [];
-    //let chatData = {};
-  
+    let arr = [];
     console.log('START');
     try {
-      await firebase
+       await firebase
         .firestore()
         .collection('chatroom')
+        .where('participantId', 'array-contains', auth().currentUser.uid)
         .get()
         .then(querySnapshot => {
           let user0, user1;
           querySnapshot.forEach(documentSnapshot => {
-
+        
             chatData.chatroomId = documentSnapshot.id;
             console.log("Char Room ID:: ", chatData.chatroomId)
 
@@ -194,11 +190,17 @@ const MessagesScreen = ({ navigation }) => {
             user1 = documentSnapshot.data()['participantId'][1];
             if (auth().currentUser.uid != user0) {
               chatData.userId = user0;
-              console.log("User Id:: ", chatData.userId);
             } else {
               chatData.userId = user1;
-              console.log("User Id:: ", chatData.userId);
-            }
+            }   
+  
+            console.log("USER ID:: ", chatData.userId);
+
+            chatData.name = getUserName(chatData.userId);
+            console.log("Name:: ", chatData.name);
+
+            chatData.image = getUserImage(chatData.userId);
+            console.log("Image:: ", chatData.image);
 
             let time1 = documentSnapshot.data().latestTime.nanoseconds
             let time2 = new Date(time1 * 1000);
@@ -209,100 +211,104 @@ const MessagesScreen = ({ navigation }) => {
 
             chatData.lastMessage = documentSnapshot.data().latestMessages;
             console.log("Last Message:: ", chatData.lastMessage);
-            console.log("=================================")
+            console.log("====================================")
 
-            //chatDataArray.push({...chatData});
-            setChatData({chatData});
-            console.log("Chat Data Array:: ", chatDataArray);
+            arr.push({ ...chatData })
+
           })
-          
-          console.log("Chat Data:: ", chatData);
+          setChatDataArray(arr);
+          console.log("Arr:: ", chatDataArray);
         })
+       
     } catch (error) {
       console.log("Error trying to get data from chatroom::", error);
     }
   }
-
   useEffect(() => {
-    fromChat();
-    const display = () => {
-      setChatData(chat);
-      //console.log("Final Output:: ", chat);
-    }
-    return () => display();
+    return () => fromChat();
   }, [])
 
-/*
-  const getUserData = () => {
+  async function getUserName(id) {
     try {
-      console.log("INSIDE getUserData");
-      firebase
+      const name = await firebase
         .firestore()
         .collection('users')
-        .doc(chatData.userId)
-        .get()
-        .then(docRef => {
-          chatData.name = docRef.data().firstName + " " + docRef.data().lastName
-          chatData.photo = docRef.data().photoURL;
-          console.log("User Data::", chatData.name, chatData.photo);
+        .doc(id)
+        .onSnapshot(querySnapShot => {
+          querySnapShot.data().firstName + " " + querySnapShot.data().lastName;
         })
+        console.log("USER NAME:: ", name);
+      return name;
     } catch (error) {
       console.log("Error: getting user info::", error)
+      return error;
+    }
+  } 
+
+  async function getUserImage(id) {
+    try {
+      const image = await firebase
+        .firestore()
+        .collection('users')
+        .doc(id)
+        .onSnapshot(querySnapShot => {
+          querySnapShot.data().photoURL
+        })
+        console.log("IMAGE::: ", image)
+      return image;      
+    } catch (error) {
+      console.log("Error: getting image url:: ", error)
+      return error;
     }
   }
-*/
-
-
 
   const ChatListItem = ({ item }) => {
     return (
-      <View>
-        {chat.map((data) => {
-          <View style={{ marginTop: 20 }}>
-            <TouchableOpacity onPress={() => handlechat(data.chatroomId)}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  paddingHorizontal: 20,
-                  paddingVertical: 20,
-                  alignItems: 'center',
-                }}>
-                <View style={{ marginRight: 40 }}>
-                  <Image
-                    source={
-                      data?.photo
-                        ? { uri: data.photo }
-                        : require('../../images/default_image.png')}
-                    style={{ width: 50, height: 50, borderRadius: 100 }}
-                  />
-                </View>
-                <View style={{ flexDirection: 'column' }}>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontWeight: 'bold',
-                      color: '#000000',
-                      marginBottom: 5,
-                    }}>
-                    {data.name}
-                  </Text>
-                  <Text style={{ fontSize: 16, color: '#000000' }}>
-                    {data.lastMessage}
-                  </Text>
-                </View>
+      <View style={{ marginTop: 20 }}>
+        {chatDataArray.map((data) => {
+          <TouchableOpacity onPress={() => handlechat(data.chatroomId)}>
+            <View
+              style={{
+                flexDirection: 'row',
+                paddingHorizontal: 20,
+                paddingVertical: 20,
+                alignItems: 'center',
+              }}>
+              <View style={{ marginRight: 40 }}>
+                <Image
+                  source={
+                    data?.image
+                      ? { uri: data.image }
+                      : require('../../images/default_image.png')}
+                  style={{ width: 50, height: 50, borderRadius: 100 }}
+                />
+              </View>
+              <View style={{ flexDirection: 'column' }}>
                 <Text
                   style={{
-                    position: 'absolute',
-                    right: 25,
                     fontSize: 16,
                     fontWeight: 'bold',
                     color: '#000000',
+                    marginBottom: 5,
                   }}>
-                  {data.lastTime}
+                  {data.name}
+                </Text>
+                <Text style={{ fontSize: 16, color: '#000000' }}>
+                  {data.lastMessage}
                 </Text>
               </View>
-            </TouchableOpacity>
-          </View>
+              <Text
+                style={{
+                  position: 'absolute',
+                  right: 25,
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  color: '#000000',
+                }}>
+                {data.lastTime}
+              </Text>
+            </View>
+          </TouchableOpacity>
         })}
       </View>
     )
@@ -320,15 +326,15 @@ const MessagesScreen = ({ navigation }) => {
           borderTopRightRadius: 40,
           borderTopLeftRadius: 40,
         }}>
-        <FlatList data={chat} renderItem={ChatListItem} />
+        <FlatList data={chatDataArray} renderItem={ChatListItem} />
       </View>
     </View>
   )
 }
 
 export default MessagesScreen;
-
-
+ 
+ 
 /*
 function getUserData() {
   try{
@@ -422,87 +428,87 @@ useEffect(() => {
 
 
 
-  /*
-    const fromChat = async () => {
-      try {
-        console.log("START")
-        await firebase
-          .firestore()
-          .collection('chatroom')
-          .get()
-          .then(querySnapshot => {
-            let chatDataArray = [];
-            let chatData = {};
-            let user0;
-            let user1;
-            querySnapshot.forEach(documentSnapshot => {
-              chatData.chatroomId = documentSnapshot.id;
-              user0 = documentSnapshot.data()['participantId'][0];
-              user1 = documentSnapshot.data()['participantId'][1];
-              if (auth().currentUser.uid != user0) {
-                chatData.userId = user0;
-                try {
-                  console.log("INSIDE IF");
-                  firebase
-                    .firestore()
-                    .collection('users')
-                    .doc(chatData.userId)
-                    .get()
-                    .then(docRef => {
-                      chatData.name = docRef.data().firstName + " " + docRef.data().lastName
-                      chatData.photo = docRef.data().photoURL;
-                      console.log("User Data::", chatData.name, chatData.photo);
-                      
-                    })
-                } catch (error) {
-                  console.log("Error", error)
-                }
-              } else {
-                chatData.userId = user1;
-                try {
-                  firebase
-                    .firestore()
-                    .collection('users')
-                    .doc(chatData.userId)
-                    .get()
-                    .then(docRef => {
-                      chatData.name = docRef.data().firstName + " " + docRef.data().lastName
-                      chatData.photo = docRef.data().photoURL;
-                      console.log("User Data::", chatData.name, chatData.photo);
-                    })
-                } catch (error) {
-                  console.log("Error", error)
-                }
+/*
+  const fromChat = async () => {
+    try {
+      console.log("START")
+      await firebase
+        .firestore()
+        .collection('chatroom')
+        .get()
+        .then(querySnapshot => {
+          let chatDataArray = [];
+          let chatData = {};
+          let user0;
+          let user1;
+          querySnapshot.forEach(documentSnapshot => {
+            chatData.chatroomId = documentSnapshot.id;
+            user0 = documentSnapshot.data()['participantId'][0];
+            user1 = documentSnapshot.data()['participantId'][1];
+            if (auth().currentUser.uid != user0) {
+              chatData.userId = user0;
+              try {
+                console.log("INSIDE IF");
+                firebase
+                  .firestore()
+                  .collection('users')
+                  .doc(chatData.userId)
+                  .get()
+                  .then(docRef => {
+                    chatData.name = docRef.data().firstName + " " + docRef.data().lastName
+                    chatData.photo = docRef.data().photoURL;
+                    console.log("User Data::", chatData.name, chatData.photo);
+                    
+                  })
+              } catch (error) {
+                console.log("Error", error)
               }
-              console.log("OUT OF IF")
-              chatData.lastMessage = documentSnapshot.data().latestMessages;
-  
-              let time1 = documentSnapshot.data().latestTime.nanoseconds
-              let time2 = new Date(time1 * 1000);
-              let hour = time2.getHours();
-              let minute = time2.getMinutes();
-              chatData.lastTime = hour + ":" + minute;
-              console.log("Time::: ", chatData.lastTime)
-  
-              chatDataArray.push(chatData);
-              console.log("Chat Data:: ", chatDataArray);
-               
-            });
-            setChatData(chatDataArray);
-            console.log("Chat Data Array:: ", chat);
-          }) 
-  
-      } catch (error) {   
-        console.log(error);
-      }
+            } else {
+              chatData.userId = user1;
+              try {
+                firebase
+                  .firestore()
+                  .collection('users')
+                  .doc(chatData.userId)
+                  .get()
+                  .then(docRef => {
+                    chatData.name = docRef.data().firstName + " " + docRef.data().lastName
+                    chatData.photo = docRef.data().photoURL;
+                    console.log("User Data::", chatData.name, chatData.photo);
+                  })
+              } catch (error) {
+                console.log("Error", error)
+              }
+            }
+            console.log("OUT OF IF")
+            chatData.lastMessage = documentSnapshot.data().latestMessages;
+ 
+            let time1 = documentSnapshot.data().latestTime.nanoseconds
+            let time2 = new Date(time1 * 1000);
+            let hour = time2.getHours();
+            let minute = time2.getMinutes();
+            chatData.lastTime = hour + ":" + minute;
+            console.log("Time::: ", chatData.lastTime)
+ 
+            chatDataArray.push(chatData);
+            console.log("Chat Data:: ", chatDataArray);
+             
+          });
+          setChatData(chatDataArray);
+          console.log("Chat Data Array:: ", chat);
+        }) 
+ 
+    } catch (error) {   
+      console.log(error);
     }
-  
-    useEffect(() => {
-      fromChat();
-      const display = () => {
-        setChatData(chat);
-        console.log("Final Output:: ", chat);
-      }
-      return () => display();
-    }, [])
-  */
+  }
+ 
+  useEffect(() => {
+    fromChat();
+    const display = () => {
+      setChatData(chat);
+      console.log("Final Output:: ", chat);
+    }
+    return () => display();
+  }, [])
+*/
