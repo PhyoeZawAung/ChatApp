@@ -4,11 +4,14 @@ import storage from "@react-native-firebase/storage";
 import {useRoute} from '@react-navigation/native';
 import {useLayoutEffect} from 'react';
 import {useEffect, useState, useCallback} from 'react';
-import {View, Text,Image,Pressable,StyleSheet} from 'react-native';
-import {GiftedChat,InputToolbar,Composer,Send,Actions,MessageImage} from 'react-native-gifted-chat';
+import {
+  View, Text, Image, Pressable, StyleSheet, Clipboard,PermissionsAndroid,Platform
+} from 'react-native';
+import {GiftedChat,InputToolbar,Composer,Send,Actions,MessageImage,MessageText,} from 'react-native-gifted-chat';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import uuid from "react-native-uuid";
-import {Icon} from "@rneui/base";
+import { Icon } from "@rneui/base";
+import RNFetchBlob from 'rn-fetch-blob';
 function ChatScreen({ navigation }) {
   const [photo, setPhoto] = useState();
   const chatroomId = firebase
@@ -204,6 +207,101 @@ function ChatScreen({ navigation }) {
       
     )
   }
+  const onLongPress = (context,message) => {
+    if (message.text) {
+      const options = [
+        'Copy',
+        'Cancel',
+      ]
+      const cancelButtonIndex = options.length - 1;
+      context.actionSheet().showActionSheetWithOptions({
+        options,
+        cancelButtonIndex,
+      },
+        (buttonIndex) => {
+          switch (buttonIndex) {
+            case 0:
+              Clipboard.setString(message.text);
+              break;
+          }
+        }); 
+    }
+    if (message.image) {
+      const options = [
+        "Download Image",
+        "Cancel"
+      ]
+      const cancelButtonIndex = options.length - 1;
+      context.actionSheet().showActionSheetWithOptions({
+        options,
+        cancelButtonIndex,
+      },
+      (buttonIndex) => {
+        switch (buttonIndex) {
+          case 0: checkPermission(message.image);
+        }
+        }); 
+    }
+    const checkPermission = async (image) => {
+    
+      // Function to check the platform
+      // If iOS then start downloading
+      // If Android then ask for permission
+   
+      if (Platform.OS === 'ios') {
+        downloadImage();
+      } else {
+        try {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+            {
+              title: 'Storage Permission Required',
+              message:
+                'App needs access to your storage to download Photos',
+            }
+          );
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            // Once user grant the permission start downloading
+            console.log('Storage Permission Granted.');
+            downloadImage(image);
+          } else {
+            // If permission denied then show alert
+            alert('Storage Permission Not Granted');
+          }
+        } catch (err) {
+          // To handle permission related exception
+          console.warn(err);
+        }
+      }
+    }; 
+    const downloadImage = (image) => {
+      let dirs = RNFetchBlob.fs.dirs.PictureDir;
+      let date = new Date();
+      RNFetchBlob.
+        config({
+          fileCache: true,
+          addAndroidDownloads: {
+            // Related to the Android only
+            useDownloadManager: true,
+            notification: true,
+            title: "Chat App By Batch 5",
+            description : 'An image file.',
+            path:
+            dirs +
+            '/image_' + 
+            Math.floor(date.getTime() + date.getSeconds() / 2) +
+            ".jpg",
+            description: 'Image',
+          },
+        })
+        .fetch("GET", image)
+        .then((res) => {
+          console.log(res.path());
+      })
+    };
+  
+   
+  }
   return (
     
       
@@ -213,7 +311,7 @@ function ChatScreen({ navigation }) {
       messages={messages}
       showAvatarForEveryMessage={true}
       onSend={messages => onSend(messages)}
-      
+      onLongPress={(context,message)=>onLongPress(context,message)}
       user={{
         _id: auth().currentUser.uid,
         name: auth().currentUser.displayName,
