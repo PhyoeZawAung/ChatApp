@@ -6,12 +6,14 @@ import {firebase} from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
 import {color} from 'react-native-reanimated';
+import {getTimestamp} from 'react-native-reanimated/lib/reanimated2/core';
 
 export default function MainScreen({navigation}) {
   const [groupName, setgroupName] = useState();
   const [users, setUsers] = useState();
   const user1 = auth().currentUser.uid;
   const [groupMember, setgroupMember] = useState([user1]);
+  const date = new Date();
 
   const ref = firebase.firestore().collection('group');
   function create({groupName, groupMember}) {
@@ -19,12 +21,12 @@ export default function MainScreen({navigation}) {
       .add({
         groupName,
         groupMember,
-        latestTime: '',
+        latestTime: date,
         latestMessage: 'Group created',
       })
       .then(docRef => {
         const docid = docRef.id;
-        navigation.navigate('Groupchat', {docid});
+        navigation.navigate('Chat', {docid});
       });
   }
 
