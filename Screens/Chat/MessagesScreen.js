@@ -147,13 +147,13 @@ class MessagesScreen extends Component {
 }
 export default MessagesScreen;
 */
-
+ 
 
 import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  Image,
+  Image, 
   TouchableOpacity,
 } from 'react-native';
 import firestore, { firebase } from '@react-native-firebase/firestore';
@@ -182,11 +182,11 @@ const MessagesScreen = ({ navigation }) => {
           .collection('chatroom')
           .where('participantId', 'array-contains', auth().currentUser.uid)
           .get()
-          .then(querySnapshot => {
+          .then(querySnapshot => {   
             let user0, user1;
-            
+            let chatData = {}; 
             querySnapshot.forEach(documentSnapshot => {
-              let chatData = {}; 
+              
               chatData.chatroomId = documentSnapshot.id;
               console.log("Chat Room ID:: ", chatData.chatroomId)
 
@@ -217,6 +217,7 @@ const MessagesScreen = ({ navigation }) => {
                 chatData.lastMessage = documentSnapshot.data().latestMessages;
                 console.log("Last Message:: ", chatData.lastMessage);
                 console.log("====================================")
+                
                 setChatData({chatData: chatData})
                 arr.push({ ...chatData })
               })  

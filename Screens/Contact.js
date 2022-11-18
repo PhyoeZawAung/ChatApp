@@ -28,7 +28,7 @@ const ContactScreen = ({navigation}) => {
       .onSnapshot(querySnapshot => {
         const user = [];
         querySnapshot.forEach(documentSnapshot => {
-          user.push({
+          user.push({ 
             ...documentSnapshot.data(),
             key: documentSnapshot.id,
           });
@@ -39,7 +39,7 @@ const ContactScreen = ({navigation}) => {
 
         // see next step
       });
-
+  
     // Unsubscribe from events when no longer in use
     return () => subscriber();
   }, []);
