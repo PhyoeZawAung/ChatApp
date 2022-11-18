@@ -165,8 +165,9 @@ const MessagesScreen = ({ navigation }) => {
   const [chatData, setChatData] = useState({})
   const [chatDataArray, setChatDataArray] = useState([]);
 
-  const handlechat = (docid) => {
-    navigation.navigate('Chat', { docid });
+  const handlechat = (chatroomId) => {
+    console.log(chatroomId);
+    navigation.navigate('Chat', { docid : chatroomId });
   }
 
   useEffect(() => {
@@ -183,9 +184,9 @@ const MessagesScreen = ({ navigation }) => {
           .get()
           .then(querySnapshot => {
             let user0, user1;
-            let chatData = {};
+            
             querySnapshot.forEach(documentSnapshot => {
-                 
+              let chatData = {}; 
               chatData.chatroomId = documentSnapshot.id;
               console.log("Chat Room ID:: ", chatData.chatroomId)
 
@@ -294,7 +295,7 @@ const MessagesScreen = ({ navigation }) => {
     return (
       <View>
         <View style={{ marginTop: 20 }}>
-          <TouchableOpacity onPress={() => handlechat(item.chatroomId)}>
+          <TouchableOpacity onPress={() => { handlechat(item.chatroomId) }}>
             <View 
               style={{
                 flexDirection: 'row',
