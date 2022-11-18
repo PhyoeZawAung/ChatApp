@@ -100,12 +100,6 @@ export default function AddScreen({navigation}) {
         </TouchableOpacity>
       </View>
       <View style={{backgroundColor: '#4F3B70'}}>
-        <View style={{height: 40}}>
-          <Text style={{fontSize: 16, color: '#ffffff'}}>
-            <Text style={{fontSize: 16, color: '#ffffff'}}>Member:</Text>{' '}
-            {nameMember}
-          </Text>
-        </View>
         <FlatList
           style={{backgroundColor: '#ffffff'}}
           data={users}
