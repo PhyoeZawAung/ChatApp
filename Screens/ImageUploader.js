@@ -102,18 +102,18 @@
 //
 //export default ImageUploader;
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Button } from 'react-native';
-import { Avatar, Dialog } from '@rneui/base';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, Pressable, Button} from 'react-native';
+import {Avatar, Dialog} from '@rneui/base';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
-import { useSelector } from 'react-redux';
-import { StackActions } from '@react-navigation/native';
-import firestore from "@react-native-firebase/firestore";
-import { useEffect } from 'react';
+import {useSelector} from 'react-redux';
+import {StackActions} from '@react-navigation/native';
+import firestore from '@react-native-firebase/firestore';
+import {useEffect} from 'react';
 
-const ImageUploader = ({ navigation }) => {
+const ImageUploader = ({navigation}) => {
   const [choice, setChoice] = useState(false);
   const firstName = useSelector(store => store.firstName);
   const lastName = useSelector(store => store.lastName);
@@ -155,7 +155,6 @@ const ImageUploader = ({ navigation }) => {
     const user = auth().currentUser;
     const name = firstName + ' ' + lastName;
     if (photoURL != null) {
-
       const imageUrl = photoURL.assets[0].uri;
       // path to existing file on filesystem
 
@@ -165,7 +164,6 @@ const ImageUploader = ({ navigation }) => {
       const pathToFile = imageUrl;
       // uploads file
       const task = reference.putFile(pathToFile);
-      
 
       task.on('state_changed', taskSnapshot => {
         console.log(
@@ -176,10 +174,7 @@ const ImageUploader = ({ navigation }) => {
         );
       });
 
-      
-
       task.then(async () => {
-
         console.log('Image uploaded to the bucket!');
         console.log('Imgae Uploaded');
 
@@ -195,18 +190,16 @@ const ImageUploader = ({ navigation }) => {
           console.log(error);
         }
 
-
         console.log('Get download url' + JSON.stringify(url));
-        
 
-        await auth().currentUser.updateProfile({ photoURL: url });
+        await auth().currentUser.updateProfile({photoURL: url});
 
         console.log('Add Profile Photo');
         console.log('Profile set');
 
         setLoadingText('Profile set');
-        console.log("Name::::" + name)
-        await user.updateProfile({ displayName: name });
+        console.log('Name::::' + name);
+        await user.updateProfile({displayName: name});
 
         console.log('Profile name set');
 
@@ -217,16 +210,14 @@ const ImageUploader = ({ navigation }) => {
 
         setLoad(false);
       });
-    }
-    else {
-      await user.updateProfile({ displayName: name });
+    } else {
+      await user.updateProfile({displayName: name});
       console.log('Profile name set');
       setLoadingText('Profile name set');
       setLoadingText('Done');
       navigation.dispatch(StackActions.replace('Home'));
       setLoad(false);
     }
-
   };
   return (
     <View style={styles.container}>
@@ -237,9 +228,9 @@ const ImageUploader = ({ navigation }) => {
             <Avatar
               size={100}
               rounded
-              source={{ uri: image.assets[0].uri }}
+              source={{uri: image.assets[0].uri}}
               title="PF"
-              containerStyle={{ backgroundColor: 'grey' }}>
+              containerStyle={{backgroundColor: 'grey'}}>
               <Avatar.Accessory
                 size={35}
                 onPress={() => {
@@ -251,8 +242,8 @@ const ImageUploader = ({ navigation }) => {
             <Avatar
               size={100}
               rounded
-              title={firstName[0] + lastName [0]}
-              containerStyle={{ backgroundColor: 'grey' }}>
+              title={firstName[0] + lastName[0]}
+              containerStyle={{backgroundColor: 'grey'}}>
               <Avatar.Accessory
                 size={35}
                 onPress={() => {
@@ -266,7 +257,7 @@ const ImageUploader = ({ navigation }) => {
           <Dialog
             isVisible={choice}
             onBackdropPress={toggleChoice}
-            overlayStyle={{ backgroundColor: '#fff', borderRadius: 10 }}>
+            overlayStyle={{backgroundColor: '#fff', borderRadius: 10}}>
             <Dialog.Title title="Pick An Option" />
 
             <Pressable
@@ -276,7 +267,7 @@ const ImageUploader = ({ navigation }) => {
                 toggleChoice();
                 getImageFromCamera();
               }}>
-              <Text style={{ color: '#fff', fontWeight: 'bold' }}>
+              <Text style={{color: '#fff', fontWeight: 'bold'}}>
                 Open Camera
               </Text>
             </Pressable>
@@ -287,7 +278,7 @@ const ImageUploader = ({ navigation }) => {
                 toggleChoice();
                 selectImage();
               }}>
-              <Text style={{ color: '#fff', fontWeight: 'bold' }}>
+              <Text style={{color: '#fff', fontWeight: 'bold'}}>
                 Choose From Storage
               </Text>
             </Pressable>
@@ -297,12 +288,12 @@ const ImageUploader = ({ navigation }) => {
                 console.log('cancel the opltion');
                 toggleChoice();
               }}>
-              <Text style={{ color: '#fff', fontWeight: 'bold' }}>Cancel</Text>
+              <Text style={{color: '#fff', fontWeight: 'bold'}}>Cancel</Text>
             </Pressable>
           </Dialog>
           <Dialog
             isVisible={load}
-            overlayStyle={{ backgroundColor: '#fff', borderRadius: 10 }}>
+            overlayStyle={{backgroundColor: '#fff', borderRadius: 10}}>
             <Dialog.Title title="Setting Up Your Profile" />
             <Text>{loadingText}</Text>
 
@@ -315,7 +306,7 @@ const ImageUploader = ({ navigation }) => {
             console.log('click continue');
             settingProfile(firstName, lastName, image);
           }}>
-          <Text style={{ color: '#fff', fontWeight: 'bold' }}>
+          <Text style={{color: '#fff', fontWeight: 'bold'}}>
             Continue to App
           </Text>
         </Pressable>

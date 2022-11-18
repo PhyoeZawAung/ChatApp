@@ -19,6 +19,8 @@ const ContactScreen = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [chatRooms, setChatRooms] = useState([]);
 
+  const date = new Date();
+
   useEffect(() => {
     setCurrentUserId(auth().currentUser.uid);
     const subscriber = firestore()
@@ -106,30 +108,29 @@ const ContactScreen = ({navigation}) => {
             (user0 == currentUserId && user1 == receiver)
           ) {
             console.log('Chat Room already exist');
-            navigation.navigate('Chat',{docid:documentSnapshot.id}) 
+            navigation.navigate('Chat', {docid: documentSnapshot.id});
             exist = true;
             return false;
           } 
         });
         if (!exist) {
           firestore()
-          .collection('chatroom')
-          .add({
-            participantId: [receiver, currentUserId],
-            latestTime: '',
-            latestMessages: '',
-          })
-          .then(docRef => {
-            const docid = docRef.id;
-            navigation.navigate('Chat', {docid});
-            console.log(docRef.id);
-            console.log('Chat Room Created');
-          })
-          .catch(error => {
-            console.error('Error adding document: ', error);
-          });
+            .collection('chatroom')
+            .add({
+              participantId: [receiver, currentUserId],
+              latestTime: date,
+              latestMessages: '',
+            })
+            .then(docRef => {
+              const docid = docRef.id;
+              navigation.navigate('Chat', {docid});
+              console.log(docRef.id);
+              console.log('Chat Room Created');
+            })
+            .catch(error => {
+              console.error('Error adding document: ', error);
+            });
         }
-        
       })
       .catch(error => {
         console.log(error);
