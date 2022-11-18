@@ -1,18 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, Image, FlatList, Button, Alert} from 'react-native';
-import {Avatar} from '@rneui/base';
-import {TextInput, TouchableOpacity} from 'react-native-gesture-handler';
+import {Avatar, Icon} from '@rneui/base';
+import {
+  TextInput,
+  TouchableOpacity,
+  Pressable,
+} from 'react-native-gesture-handler';
 import {firebase} from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import storage from '@react-native-firebase/storage';
-import {color} from 'react-native-reanimated';
-import {getTimestamp} from 'react-native-reanimated/lib/reanimated2/core';
 
-export default function MainScreen({navigation}) {
+export default function AddScreen({navigation}) {
   const [groupName, setgroupName] = useState();
   const [users, setUsers] = useState();
   const user1 = auth().currentUser.uid;
   const [groupMember, setgroupMember] = useState([user1]);
+  const [nameMember, setnameMember] = useState([]);
   const date = new Date();
 
   const ref = firebase.firestore().collection('group');
@@ -24,18 +26,24 @@ export default function MainScreen({navigation}) {
         latestTime: date,
         latestMessage: 'Group created',
       })
-      .then(docRef => {
-        const docid = docRef.id;
-        navigation.navigate('Chat', {docid});
+      .then(doc => {
+        const docid = doc.id;
+        navigation.navigate('Groupchat', {docid});
+        console.log(doc.id);
       });
   }
 
-  const addMember = members => {
+  const addMember = (members, namer) => {
     let data = groupMember;
     data.push(members);
     setgroupMember(data);
+    let dataname = nameMember;
+    dataname.push(namer);
+    setnameMember(dataname);
+
+    console.log(members);
     console.log(groupMember);
-    console.log('Member', members);
+    console.log('Member', namer);
   };
 
   const name = firebase
@@ -51,6 +59,18 @@ export default function MainScreen({navigation}) {
       });
       setUsers([...users, users]);
     });
+  // useEffect(() => {
+  //   let array = setUsers.map((item, index) => {
+  //     item.isSelected = false;
+  //     return {...item};
+  //   });
+  //   console.log(array);
+  //   setUsers({users: array});
+  // });
+  // const selectionHandler = () => {
+  //   isSelected: false;
+  // };
+  //const array = users.id.filter(element => element != groupMember);
   return (
     <View style={{backgroundColor: '#ffffff'}}>
       <View
@@ -79,48 +99,62 @@ export default function MainScreen({navigation}) {
           <Text style={{color: '#000000', alignSelf: 'center'}}>Create</Text>
         </TouchableOpacity>
       </View>
-      <View style={{marginTop: 40, backgroundColor: '#ffffff'}}>
+      <View style={{backgroundColor: '#4F3B70'}}>
+        <View style={{height: 40}}>
+          <Text style={{fontSize: 16, color: '#ffffff'}}>
+            <Text style={{fontSize: 16, color: '#ffffff'}}>Member:</Text>{' '}
+            {nameMember}
+          </Text>
+        </View>
         <FlatList
           style={{backgroundColor: '#ffffff'}}
           data={users}
-          renderItem={({item}) => (
-            <View
-              style={{
-                borderBottomColor: '#4F3B70',
-                borderWidth: 1,
-                flexDirection: 'row',
-                backgroundColor: '#ffffff',
-                alignItems: 'center',
-                paddingHorizontal: 20,
-                paddingVertical: 20,
-              }}>
-              <Image
-                source={
-                  item?.photoURL
-                    ? {uri: item?.photoURL}
-                    : require('../images/default_image.png')
-                }
-                style={{height: 40, width: 40, marginRight: 60}}
-              />
-              <Text style={{color: '#4F3B70', fontWeight: 'bold'}}>
-                {item.firstName}
-                {item.lastName}
-              </Text>
+          renderItem={({item}) => {
+            let isMember = groupMember.includes(item.id);
+            return (
               <View
                 style={{
-                  backgroundColor: '#4F3B70',
+                  borderBottomColor: '#4F3B70',
+                  borderWidth: 1,
+                  flexDirection: 'row',
+                  backgroundColor: '#ffffff',
+                  alignItems: 'center',
                   paddingHorizontal: 20,
-                  paddingVertical: 10,
-                  position: 'absolute',
-                  right: 10,
-                  borderRadius: 50,
+                  paddingVertical: 20,
                 }}>
-                <TouchableOpacity onPress={() => addMember(item.id)}>
-                  <Text style={{color: '#ffffff'}}>Add</Text>
-                </TouchableOpacity>
+                <Image
+                  source={
+                    item?.photoURL
+                      ? {uri: item?.photoURL}
+                      : require('../images/default_image.png')
+                  }
+                  style={{height: 40, width: 40, marginRight: 60}}
+                />
+                <Text style={{color: '#4F3B70', fontWeight: 'bold'}}>
+                  {item.firstName}
+
+                  {item.lastName}
+                </Text>
+                <View
+                  style={{
+                    backgroundColor: '#4F3B70',
+                    paddingHorizontal: 20,
+                    paddingVertical: 10,
+                    position: 'absolute',
+                    right: 10,
+                    borderRadius: 50,
+                  }}>
+                  <TouchableOpacity
+                    disabled={isMember}
+                    onPress={() => addMember(item.id, item.firstName)}>
+                    <Text style={{color: '#ffffff'}}>
+                      {isMember ? 'Added' : 'Add'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          )}
+            );
+          }}
         />
       </View>
     </View>

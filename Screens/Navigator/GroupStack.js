@@ -24,7 +24,9 @@ function GroupScreen() {
             </TouchableOpacity>
           ),
         })}></GroupStack.Screen>
-      <GroupStack.Screen name="Groupchat" component={ChatScreen}></GroupStack.Screen>
+      <GroupStack.Screen
+        name="Groupchat"
+        component={ChatScreen}></GroupStack.Screen>
       <GroupStack.Screen
         name="Create Group"
         component={AddScreen}></GroupStack.Screen>
