@@ -169,104 +169,132 @@ const MessagesScreen = ({ navigation }) => {
     navigation.navigate('Chat', { docid });
   }
 
-  async function fromChat() {
-
-    let arr = [];
-    console.log('START');
-    try {
-       await firebase
-        .firestore()
-        .collection('chatroom')
-        .where('participantId', 'array-contains', auth().currentUser.uid)
-        .get()
-        .then(querySnapshot => {
-          let user0, user1;
-          querySnapshot.forEach(documentSnapshot => {
-        
-            chatData.chatroomId = documentSnapshot.id;
-            console.log("Char Room ID:: ", chatData.chatroomId)
-
-            user0 = documentSnapshot.data()['participantId'][0];
-            user1 = documentSnapshot.data()['participantId'][1];
-            if (auth().currentUser.uid != user0) {
-              chatData.userId = user0;
-            } else {
-              chatData.userId = user1;
-            }   
-  
-            console.log("USER ID:: ", chatData.userId);
-
-            chatData.name = getUserName(chatData.userId);
-            console.log("Name:: ", chatData.name);
-
-            chatData.image = getUserImage(chatData.userId);
-            console.log("Image:: ", chatData.image);
-
-            let time1 = documentSnapshot.data().latestTime.nanoseconds
-            let time2 = new Date(time1 * 1000);
-            let hour = time2.getHours();
-            let minute = time2.getMinutes();
-            chatData.lastTime = hour + ":" + minute;
-            console.log("Last Time:: ", chatData.lastTime);
-
-            chatData.lastMessage = documentSnapshot.data().latestMessages;
-            console.log("Last Message:: ", chatData.lastMessage);
-            console.log("====================================")
-
-            arr.push({ ...chatData })
-
-          })
-          setChatDataArray(arr);
-          console.log("Arr:: ", chatDataArray);
-        })
-       
-    } catch (error) {
-      console.log("Error trying to get data from chatroom::", error);
-    }
-  }
   useEffect(() => {
-    return () => fromChat();
-  }, [])
 
-  async function getUserName(id) {
+    async function fromChat() {
+
+      let arr = [];
+      console.log('START');
+      try {
+        await firebase
+          .firestore()
+          .collection('chatroom')
+          .where('participantId', 'array-contains', auth().currentUser.uid)
+          .get()
+          .then(querySnapshot => {
+            let user0, user1;
+            let chatData = {};
+            querySnapshot.forEach(documentSnapshot => {
+                 
+              chatData.chatroomId = documentSnapshot.id;
+              console.log("Chat Room ID:: ", chatData.chatroomId)
+
+              user0 = documentSnapshot.data()['participantId'][0];
+              user1 = documentSnapshot.data()['participantId'][1];
+              if (auth().currentUser.uid != user0) {
+                chatData.userId = user0;
+              } else {
+                chatData.userId = user1;
+              }
+
+              console.log("USER ID:: ", chatData.userId);
+
+              getUserData(chatData.userId).then(item => {
+                chatData.name = item.name;
+                chatData.image = item.image;
+
+                console.log("Name ::", chatData.name);
+                console.log("Image ::", chatData.image);
+
+                let time1 = documentSnapshot.data().latestTime.nanoseconds
+                let time2 = new Date(time1 * 1000);
+                let hour = time2.getHours();
+                let minute = time2.getMinutes();
+                chatData.lastTime = hour + ":" + minute;
+                console.log("Last Time:: ", chatData.lastTime);
+
+                chatData.lastMessage = documentSnapshot.data().latestMessages;
+                console.log("Last Message:: ", chatData.lastMessage);
+                console.log("====================================")
+                setChatData({chatData: chatData})
+                arr.push({ ...chatData })
+              })  
+            })  
+            setChatDataArray(arr);
+            console.log("Chat Data Array:: ", chatDataArray);  
+            // console.log("Chat Data Array ::: ", arr);
+            // return arr;    
+          }) 
+           
+      } catch (error) {
+        console.log("Error trying to get data from chatroom::", error);
+      }
+    }   
+    //setChatDataArray(fromChat()) 
+    fromChat(); 
+             
+  }, [])   
+ 
+
+  
+  // const userData = (id) => {
+  //   return new Promise( (resolve, reject) => { 
+  //     const data = {};
+  //     firebase
+  //       .firestore()
+  //       .collection('users')
+  //       .doc(id)
+  //       .get()
+  //       .then( docRef => {
+  //         data.name = docRef.data().firstName + " " + docRef.data().lastName;
+  //         data.image = docRef.data().photoURL;
+  //       })
+  //       console.log("PHOTO:: ", data.image);
+  //       console.log("NAME::: ", data.name);
+  //     if (data){
+  //       resolve(data);
+  //     }else {
+  //       reject(); 
+  //     } 
+  //   })
+  // }
+
+  // const getUserData = async(id) => {
+  //   const result =  await userData(id);
+  //   console.log("RESULT:: ", result);
+  // }
+
+
+  const getUserData = async (id) => {
+    const data = {};
     try {
-      const name = await firebase
+      await firebase
         .firestore()
         .collection('users')
         .doc(id)
-        .onSnapshot(querySnapShot => {
-          querySnapShot.data().firstName + " " + querySnapShot.data().lastName;
+        .get()
+        .then(docRef => {
+          data.name = docRef.data().firstName + " " + docRef.data().lastName;
+          data.image = docRef.data().photoURL;
         })
-        console.log("USER NAME:: ", name);
-      return name;
-    } catch (error) {
-      console.log("Error: getting user info::", error)
-      return error;
-    }
-  } 
+      console.log("Name from function::: ", data.name);
+      return data;
 
-  async function getUserImage(id) {
-    try {
-      const image = await firebase
-        .firestore()
-        .collection('users')
-        .doc(id)
-        .onSnapshot(querySnapShot => {
-          querySnapShot.data().photoURL
-        })
-        console.log("IMAGE::: ", image)
-      return image;      
     } catch (error) {
-      console.log("Error: getting image url:: ", error)
-      return error;
+      console.log(error);
     }
   }
+
+  // async function getData(id) {
+  //   const userData = await getUserData(id)
+  //   return userData;
+  // }
 
   const ChatListItem = ({ item }) => {
     return (
-      <View style={{ marginTop: 20 }}>
-        {chatDataArray.map((data) => {
-          <TouchableOpacity onPress={() => handlechat(data.chatroomId)}>
+      <View>
+        <View style={{ marginTop: 20 }}>
+          <TouchableOpacity onPress={() => handlechat(item.chatroomId)}>
             <View
               style={{
                 flexDirection: 'row',
@@ -277,8 +305,8 @@ const MessagesScreen = ({ navigation }) => {
               <View style={{ marginRight: 40 }}>
                 <Image
                   source={
-                    data?.image
-                      ? { uri: data.image }
+                    item?.image
+                      ? { uri: item.image }
                       : require('../../images/default_image.png')}
                   style={{ width: 50, height: 50, borderRadius: 100 }}
                 />
@@ -291,10 +319,10 @@ const MessagesScreen = ({ navigation }) => {
                     color: '#000000',
                     marginBottom: 5,
                   }}>
-                  {data.name}
+                  {item.name}
                 </Text>
                 <Text style={{ fontSize: 16, color: '#000000' }}>
-                  {data.lastMessage}
+                  {item.lastMessage}
                 </Text>
               </View>
               <Text
@@ -305,11 +333,11 @@ const MessagesScreen = ({ navigation }) => {
                   fontWeight: 'bold',
                   color: '#000000',
                 }}>
-                {data.lastTime}
+                {item.lastTime}
               </Text>
             </View>
           </TouchableOpacity>
-        })}
+        </View>
       </View>
     )
   }
@@ -320,12 +348,11 @@ const MessagesScreen = ({ navigation }) => {
           My Chatlists
         </Text>
       </View>
-      <View
-        style={{
-          backgroundColor: '#ffffff',
-          borderTopRightRadius: 40,
-          borderTopLeftRadius: 40,
-        }}>
+      <View style={{
+        backgroundColor: '#ffffff',
+        borderTopRightRadius: 40,
+        borderTopLeftRadius: 40,
+      }}>
         <FlatList data={chatDataArray} renderItem={ChatListItem} />
       </View>
     </View>
@@ -333,8 +360,8 @@ const MessagesScreen = ({ navigation }) => {
 }
 
 export default MessagesScreen;
- 
- 
+
+
 /*
 function getUserData() {
   try{
