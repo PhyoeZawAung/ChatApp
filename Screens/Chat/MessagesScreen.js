@@ -181,10 +181,9 @@ const MessagesScreen = ({ navigation }) => {
           .firestore()
           .collection('chatroom')
           .where('participantId', 'array-contains', auth().currentUser.uid)
-          .get()
-          .then(querySnapshot => {   
+          .onSnapshot(querySnapshot => {
             let user0, user1;
-            let chatData = {}; 
+            arr = [];
             querySnapshot.forEach(documentSnapshot => {
               
               chatData.chatroomId = documentSnapshot.id;
@@ -219,6 +218,7 @@ const MessagesScreen = ({ navigation }) => {
                 console.log("====================================")
                 
                 setChatData({chatData: chatData})
+                
                 arr.push({ ...chatData })
               })  
             })  
