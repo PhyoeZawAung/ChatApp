@@ -52,6 +52,7 @@ const SignUpScreen = ({navigation}) => {
             .collection('users')
             .doc(cred.user.uid)
             .set({
+              id: auth().currentUser.uid,
               firstName,
               lastName,
               email,

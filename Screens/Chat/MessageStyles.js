@@ -1,3 +1,4 @@
+/*
 import styled from 'styled-components';
 
 export const Container = styled.View`
@@ -62,3 +63,72 @@ export const MessageText = styled.Text`
   font-size: 14px;
   color: #333333;
 `;
+*/
+/*
+import React from 'react';
+import {View, TouchableOpacity, Text, Image, StyleSheet} from 'react-native';
+
+const ChatListItem = (props) => {
+  return(
+    <View style={styles.container}>
+      <TouchableOpacity onPress={() => {}}>
+        <View style={styles.imageWrapper}>
+          <Image source={ require('./img/img1.jpg')}/>
+        </View>
+        <View style={styles.textWrapper}>
+          <Text style={styles.name}>{props.name}</Text>
+          <Text style={styles.lastMessage}>{props.lastMessage}</Text>
+        </View>
+        <View style={style.activeTime}>
+          <Text>{props.activeTime}</Text>
+        </View>
+      </TouchableOpacity>
+    </View>
+  )
+}
+
+export default ChatListItem;
+
+const styles = StyleSheet.create({
+  
+  container: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: 'grey',
+  },
+
+  imageWrapper: {
+    width: 50,
+    height: 50,
+    borderRadius: 100,
+    borderWidth: 2,
+    borderColor: '#4F3B70',
+  },
+
+  textWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+
+  name: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#4F3B70',
+    marginBottom: 10,
+  },
+
+  lastMessage: {
+    color: '#d2d2d4',
+    fontSize: 7,
+    fontWeight: '300',
+  },
+
+  activeTime: {
+    color: '#d2d2d4',
+    fontSize: 7,
+    fontWeight: '300',
+  },
+  
+})
+*/
