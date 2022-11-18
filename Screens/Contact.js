@@ -54,7 +54,7 @@ const ContactScreen = ({navigation}) => {
             backgroundColor: '#ffffff',
             marginHorizontal: 20,
           }}>
-          <TouchableOpacity
+          <TouchableOpacity 
             onPress={() => {
               handlechat(item.key);
             }}>
@@ -83,8 +83,8 @@ const ContactScreen = ({navigation}) => {
                     color: '#000000',
                     marginBottom: 5,
                   }}>
-                  {item.firstName}
-                  {item.lastName}
+                  {item.firstName + " " +
+                  item.lastName}
                 </Text>
               </View>
             </View>
@@ -100,7 +100,7 @@ const ContactScreen = ({navigation}) => {
       .then(querySnapshot => {
         let exist = false;
         querySnapshot.forEach(documentSnapshot => {
-          user0 = documentSnapshot.data()['participantId'][0];
+          user0 = documentSnapshot.data()['participantId'][0]; 
           user1 = documentSnapshot.data()['participantId'][1];
 
           if (
@@ -111,7 +111,7 @@ const ContactScreen = ({navigation}) => {
             navigation.navigate('Chat', {docid: documentSnapshot.id});
             exist = true;
             return false;
-          }
+          } 
         });
         if (!exist) {
           firestore()
