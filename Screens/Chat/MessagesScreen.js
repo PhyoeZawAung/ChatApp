@@ -295,7 +295,7 @@ const MessagesScreen = ({ navigation }) => {
       <View>
         <View style={{ marginTop: 20 }}>
           <TouchableOpacity onPress={() => handlechat(item.chatroomId)}>
-            <View
+            <View 
               style={{
                 flexDirection: 'row',
                 paddingHorizontal: 20,
