@@ -146,7 +146,6 @@ const ContactScreen = ({navigation}) => {
         <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold'}}>
           Contacts
         </Text>
-        <Text>{currentUserId}</Text>
       </View>
       <FlatList data={allusers} renderItem={renderItem}></FlatList>
     </View>

@@ -80,7 +80,8 @@ const SignUpScreen = ({navigation}) => {
     <View style={styles.container}>
       <View style={styles.signUpCard}>
         <Text style={styles.header}>Register</Text>
-        <Text style={styles.text}>Please Sign Up Your Account</Text>
+        <Text style={styles.text}>Sign Up Your Account</Text>
+        
 
         <Formik
           initialValues={{
@@ -240,7 +241,7 @@ const SignUpScreen = ({navigation}) => {
 };
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#9b5de0',
+    backgroundColor: '#4F3B70',
     flex: 1,
     padding: 30,
   },
@@ -250,6 +251,8 @@ const styles = StyleSheet.create({
     fontSize: 40,
     color: '#fff',
     paddingVertical: 16,
+    textAlign: 'center',
+    marginBottom: 50,
   },
   text: {
     color: '#fff',
@@ -258,11 +261,11 @@ const styles = StyleSheet.create({
   InputBox: {
     width: '100%',
 
-    paddingVertical: 40,
+    paddingVertical: 15,
   },
   name: {
     flexDirection: 'row',
-    marginVertical: 10,
+    marginVertical: 5,
     justifyContent: 'space-between',
   },
   nameInput: {
@@ -288,12 +291,12 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   showhidebutton: {
-    color: '#e211d1',
+    color: '#3fb585',
     paddingRight: 20,
   },
   button: {
     width: '100%',
-    backgroundColor: '#e211d1',
+    backgroundColor: '#3fb585',
     marginVertical: 10,
     alignItems: 'center',
     borderRadius: 20,
