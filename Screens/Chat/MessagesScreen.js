@@ -165,6 +165,17 @@ const MessagesScreen = ({ navigation }) => {
   const [chatData, setChatData] = useState({})
   const [chatDataArray, setChatDataArray] = useState([]);
 
+  function convertTime(date){
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours%12;
+    hours = hours ? hours : 12;
+    minutes = minutes < 10 ? '0'+minutes : minutes;
+    var time = hours + ':' + minutes + ' ' + ampm;
+    return time;
+  }
+
   const handlechat = (chatroomId) => {
     console.log(chatroomId);
     navigation.navigate('Chat', { docid : chatroomId });
@@ -185,7 +196,7 @@ const MessagesScreen = ({ navigation }) => {
             let user0, user1;
             arr = [];
             querySnapshot.forEach(documentSnapshot => {
-              
+              let chatData={};
               chatData.chatroomId = documentSnapshot.id;
               console.log("Chat Room ID:: ", chatData.chatroomId)
 
@@ -193,7 +204,7 @@ const MessagesScreen = ({ navigation }) => {
               user1 = documentSnapshot.data()['participantId'][1];
               if (auth().currentUser.uid != user0) {
                 chatData.userId = user0;
-              } else {
+              } else { 
                 chatData.userId = user1;
               }
 
@@ -206,11 +217,9 @@ const MessagesScreen = ({ navigation }) => {
                 console.log("Name ::", chatData.name);
                 console.log("Image ::", chatData.image);
 
-                let time1 = documentSnapshot.data().latestTime.nanoseconds
+                let time1 = documentSnapshot.data().latestTime
                 let time2 = new Date(time1 * 1000);
-                let hour = time2.getHours();
-                let minute = time2.getMinutes();
-                chatData.lastTime = hour + ":" + minute;
+                chatData.lastTime = convertTime(time2);
                 console.log("Last Time:: ", chatData.lastTime);
 
                 chatData.lastMessage = documentSnapshot.data().latestMessages;
@@ -223,49 +232,18 @@ const MessagesScreen = ({ navigation }) => {
               })  
             })  
             setChatDataArray(arr);
-            console.log("Chat Data Array:: ", chatDataArray);  
-            // console.log("Chat Data Array ::: ", arr);
-            // return arr;    
+            console.log("Chat Data Array:: ", chatDataArray);        
           }) 
            
       } catch (error) {
         console.log("Error trying to get data from chatroom::", error);
       }
     }   
-    //setChatDataArray(fromChat()) 
+ 
     fromChat(); 
              
   }, [])   
  
-
-  
-  // const userData = (id) => {
-  //   return new Promise( (resolve, reject) => { 
-  //     const data = {};
-  //     firebase
-  //       .firestore()
-  //       .collection('users')
-  //       .doc(id)
-  //       .get()
-  //       .then( docRef => {
-  //         data.name = docRef.data().firstName + " " + docRef.data().lastName;
-  //         data.image = docRef.data().photoURL;
-  //       })
-  //       console.log("PHOTO:: ", data.image);
-  //       console.log("NAME::: ", data.name);
-  //     if (data){
-  //       resolve(data);
-  //     }else {
-  //       reject(); 
-  //     } 
-  //   })
-  // }
-
-  // const getUserData = async(id) => {
-  //   const result =  await userData(id);
-  //   console.log("RESULT:: ", result);
-  // }
-
 
   const getUserData = async (id) => {
     const data = {};
@@ -287,10 +265,6 @@ const MessagesScreen = ({ navigation }) => {
     }
   }
 
-  // async function getData(id) {
-  //   const userData = await getUserData(id)
-  //   return userData;
-  // }
 
   const ChatListItem = ({ item }) => {
     return (
@@ -323,17 +297,18 @@ const MessagesScreen = ({ navigation }) => {
                   }}>
                   {item.name}
                 </Text>
-                <Text style={{ fontSize: 16, color: '#000000' }}>
+                <Text style={{ fontSize: 16, color: '#91918e' }}>
                   {item.lastMessage}
                 </Text>
               </View>
               <Text
                 style={{
                   position: 'absolute',
+                  top: 22,
                   right: 25,
-                  fontSize: 16,
+                  fontSize: 13,
                   fontWeight: 'bold',
-                  color: '#000000',
+                  color: '#4F3B70',
                 }}>
                 {item.lastTime}
               </Text>
