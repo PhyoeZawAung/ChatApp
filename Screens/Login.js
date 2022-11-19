@@ -91,8 +91,9 @@ const LoginScreen = ({navigation}) => {
     <View style={styles.container}>
       <View style={styles.InputBox}>
       <View>
-        <Text style={styles.header}>Login</Text>
-        <Text style={styles.text}>Please Sign In to Continue</Text>
+        <Text style={[styles.header, {textAlign: 'center'}]}>Login</Text>
+        <Text style={styles.text}>Please sign in to continue</Text>
+        
       </View>
 
       
@@ -130,13 +131,13 @@ const LoginScreen = ({navigation}) => {
               signIn(email, password);
               //navigation.navigate("Messages");
             }}>
-            <Text style={{color: '#fff', fontWeight: 'bold'}}>Login</Text>
+            <Text style={{color: '#fff', fontWeight: 'bold'}}>LOGIN</Text>
           </Pressable>
           <Pressable
             onPress={() => {
               navigation.navigate('Forgot');
             }}>
-            <Text style={styles.text}>Forgotten Password?</Text>
+            <Text style={[styles.text, {color: '#bf9bfa'}]}>Forgotten Password?</Text>
             </Pressable>
             </View>
 
@@ -178,7 +179,7 @@ const LoginScreen = ({navigation}) => {
 };
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#9b5de0',
+    backgroundColor: '#4F3B70',
     flex: 1,
     justifyContent:"space-between",
     padding: 30,
@@ -189,10 +190,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
+    textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 40,
     color: '#fff',
     paddingVertical: 16,
+    marginBottom: 50,
   },
   signUpText: {
     color: '#46eeaa',
@@ -225,12 +228,12 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   showhidebutton: {
-    color: '#e211d1',
+    color: '#3fb585',
     paddingRight: 20,
   },
   button: {
-    width: 350,
-    backgroundColor: '#e211d1',
+    width: 300,
+    backgroundColor: '#3fb585',
     marginVertical: 10,
     alignItems: 'center',
     borderRadius: 20,

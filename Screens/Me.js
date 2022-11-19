@@ -312,7 +312,7 @@ const MeScreen = ({ navigation }) => {
             toggleEditFirstName();
             setUserFirstName(updateUserFirstName);
           }}>
-          {!editFirstName ? <Text>Edit</Text> : <Text>Done</Text>}
+          {!editFirstName ? <Text style={{color: '#46eeaa'}}>Edit</Text> : <Text>Done</Text>}
         </Pressable>
       </View>
       <View style={styles.EditView}>
@@ -332,7 +332,7 @@ const MeScreen = ({ navigation }) => {
             toggleEditLastName();
             setUserLastName(updateUserLastName);
           }}>
-          {!editLastName ? <Text>Edit</Text> : <Text>Done</Text>}
+          {!editLastName ? <Text style={{color: '#46eeaa'}}>Edit</Text> : <Text>Done</Text>}
         </Pressable>
       </View>
       <View style={styles.EditView}>
@@ -355,7 +355,7 @@ const MeScreen = ({ navigation }) => {
             toggleEditMail();
             setUserEmail(updateUserEmail);
           }}>
-          {!editMail ? <Text>Edit</Text> : <Text>Done</Text>}
+          {!editMail ? <Text style={{color: '#46eeaa'}}>Edit</Text> : <Text>Done</Text>}
         </Pressable>
       </View>
       {/*<View style={styles.EditView}>
@@ -411,7 +411,8 @@ const MeScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#9b5de0',
+    //backgroundColor: '#9b5de0',
+    backgroundColor: '#4F3B70',
     flex: 1,
     padding: 30,
     alignItems: 'center',
@@ -428,7 +429,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '100%',
-    backgroundColor: '#e211d1',
+    backgroundColor: '#3fb585',
     marginVertical: 10,
     alignItems: 'center',
     borderRadius: 20,
