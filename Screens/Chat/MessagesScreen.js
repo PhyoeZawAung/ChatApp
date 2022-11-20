@@ -147,32 +147,35 @@ class MessagesScreen extends Component {
 }
 export default MessagesScreen;
 */
- 
 
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  Image, 
-  TouchableOpacity,
-} from 'react-native';
-import firestore, { firebase } from '@react-native-firebase/firestore';
+import React, {useEffect, useState} from 'react';
+import {View, Text, Image, TouchableOpacity} from 'react-native';
+import firestore, {firebase} from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import { FlatList } from 'react-native-gesture-handler';
+import {FlatList} from 'react-native-gesture-handler';
 
-const MessagesScreen = ({ navigation }) => {
-
-  const [chatData, setChatData] = useState({})
+const MessagesScreen = ({navigation}) => {
+  const [chatData, setChatData] = useState({});
   const [chatDataArray, setChatDataArray] = useState([]);
 
-  const handlechat = (docid) => {
-    navigation.navigate('Chat', { docid });
+  function convertTime(date) {
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    var time = hours + ':' + minutes + ' ' + ampm;
+    return time;
   }
 
+  const handlechat = chatroomId => {
+    console.log(chatroomId);
+    navigation.navigate('Chat', {docid: chatroomId});
+  };
+
   useEffect(() => {
-
     async function fromChat() {
-
       let arr = [];
       console.log('START');
       try {
@@ -182,58 +185,55 @@ const MessagesScreen = ({ navigation }) => {
           .where('participantId', 'array-contains', auth().currentUser.uid)
           .onSnapshot(querySnapshot => {
             let user0, user1;
-            let chatData = {};
+            arr = [];
             querySnapshot.forEach(documentSnapshot => {
-                 
+              let chatData = {};
               chatData.chatroomId = documentSnapshot.id;
-              console.log("Chat Room ID:: ", chatData.chatroomId)
+              console.log('Chat Room ID:: ', chatData.chatroomId);
 
               user0 = documentSnapshot.data()['participantId'][0];
               user1 = documentSnapshot.data()['participantId'][1];
               if (auth().currentUser.uid != user0) {
                 chatData.userId = user0;
-              } else { 
+              } else {
                 chatData.userId = user1;
               }
 
-              console.log("USER ID:: ", chatData.userId);
+              console.log('USER ID:: ', chatData.userId);
 
               getUserData(chatData.userId).then(item => {
                 chatData.name = item.name;
                 chatData.image = item.image;
 
-                console.log("Name ::", chatData.name);
-                console.log("Image ::", chatData.image);
+                console.log('Name ::', chatData.name);
+                console.log('Image ::', chatData.image);
 
-                let time1 = documentSnapshot.data().latestTime
+                let time1 = documentSnapshot.data().latestTime;
                 let time2 = new Date(time1 * 1000);
                 chatData.lastTime = convertTime(time2);
-                console.log("Last Time:: ", chatData.lastTime);
+                console.log('Last Time:: ', chatData.lastTime);
 
                 chatData.lastMessage = documentSnapshot.data().latestMessages;
-                console.log("Last Message:: ", chatData.lastMessage);
-                console.log("====================================")
-                
-                setChatData({chatData: chatData})
-                
-                arr.push({ ...chatData })
-              })  
-            })  
-            setChatDataArray(arr);
-            console.log("Chat Data Array:: ", chatDataArray);        
-          }) 
-           
-      } catch (error) {
-        console.log("Error trying to get data from chatroom::", error);
-      }
-    }   
- 
-    fromChat(); 
-             
-  }, [])   
- 
+                console.log('Last Message:: ', chatData.lastMessage);
+                console.log('====================================');
 
-  const getUserData = async (id) => {
+                setChatData({chatData: chatData});
+
+                arr.push({...chatData});
+              });
+            });
+            setChatDataArray(arr);
+            console.log('Chat Data Array:: ', chatDataArray);
+          });
+      } catch (error) {
+        console.log('Error trying to get data from chatroom::', error);
+      }
+    }
+
+    fromChat();
+  }, []);
+
+  const getUserData = async id => {
     const data = {};
     try {
       await firebase
@@ -242,40 +242,42 @@ const MessagesScreen = ({ navigation }) => {
         .doc(id)
         .get()
         .then(docRef => {
-          data.name = docRef.data().firstName + " " + docRef.data().lastName;
+          data.name = docRef.data().firstName + ' ' + docRef.data().lastName;
           data.image = docRef.data().photoURL;
-        })
-      console.log("Name from function::: ", data.name);
+        });
+      console.log('Name from function::: ', data.name);
       return data;
-
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
-
-  const ChatListItem = ({ item }) => {
+  const ChatListItem = item => {
     return (
       <View>
-        <View style={{ marginTop: 20 }}>
-          <TouchableOpacity onPress={() => handlechat(item.chatroomId)}>
-            <View 
+        <View style={{marginTop: 20}}>
+          <TouchableOpacity
+            onPress={() => {
+              handlechat(item.chatroomId);
+            }}>
+            <View
               style={{
                 flexDirection: 'row',
                 paddingHorizontal: 20,
                 paddingVertical: 20,
                 alignItems: 'center',
               }}>
-              <View style={{ marginRight: 40 }}>
+              <View style={{marginRight: 40}}>
                 <Image
                   source={
                     item?.image
-                      ? { uri: item.image }
-                      : require('../../images/default_image.png')}
-                  style={{ width: 50, height: 50, borderRadius: 100 }}
+                      ? {uri: item.image}
+                      : require('../../images/default_image.png')
+                  }
+                  style={{width: 50, height: 50, borderRadius: 100}}
                 />
               </View>
-              <View style={{ flexDirection: 'column' }}>
+              <View style={{flexDirection: 'column'}}>
                 <Text
                   style={{
                     fontSize: 16,
@@ -285,7 +287,7 @@ const MessagesScreen = ({ navigation }) => {
                   }}>
                   {item.name}
                 </Text>
-                <Text style={{ fontSize: 16, color: '#91918e' }}>
+                <Text style={{fontSize: 16, color: '#91918e'}}>
                   {item.lastMessage}
                 </Text>
               </View>
@@ -304,28 +306,31 @@ const MessagesScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-    )
-  }
+    );
+  };
   return (
-    <View style={{ backgroundColor: '#4F3B70' }}>
-      <View style={{ padding: 20 }}>
-        <Text style={{ fontSize: 32, color: 'white', fontWeight: 'bold' }}>
+    <View style={{backgroundColor: '#4F3B70'}}>
+      <View style={{padding: 20}}>
+        <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold'}}>
           My Chatlists
         </Text>
       </View>
-      <View style={{
-        backgroundColor: '#ffffff',
-        borderTopRightRadius: 40,
-        borderTopLeftRadius: 40,
-      }}>
-        <FlatList data={chatDataArray} renderItem={ChatListItem} />
+      <View
+        style={{
+          backgroundColor: '#ffffff',
+          borderTopRightRadius: 40,
+          borderTopLeftRadius: 40,
+        }}>
+        <FlatList
+          data={chatDataArray}
+          renderItem={ChatListItem}
+        />
       </View>
     </View>
-  )
-}
+  );
+};
 
 export default MessagesScreen;
-
 
 /*
 function getUserData() {
@@ -417,8 +422,6 @@ useEffect(() => {
   return () => display();
 }, [])
 */
-
-
 
 /*
   const fromChat = async () => {
