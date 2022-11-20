@@ -148,158 +148,162 @@ class MessagesScreen extends Component {
 export default MessagesScreen;
 */
 
-import React, {useEffect, useState} from 'react';
-import {View, Text, Image, TouchableOpacity} from 'react-native';
-import firestore, {firebase} from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
-import {FlatList} from 'react-native-gesture-handler';
+import React, { useEffect, useState } from "react";
+import { View, Text, Image, TouchableOpacity } from "react-native";
+import firestore, { firebase } from "@react-native-firebase/firestore";
+import auth from "@react-native-firebase/auth";
+import { FlatList } from "react-native-gesture-handler";
 
-const MessagesScreen = ({navigation}) => {
+const MessagesScreen = ({ navigation }) => {
   const [chatData, setChatData] = useState({});
   const [chatDataArray, setChatDataArray] = useState([]);
 
   function convertTime(date) {
     var hours = date.getHours();
     var minutes = date.getMinutes();
-    var ampm = hours >= 12 ? 'pm' : 'am';
+    var ampm = hours >= 12 ? "pm" : "am";
     hours = hours % 12;
     hours = hours ? hours : 12;
-    minutes = minutes < 10 ? '0' + minutes : minutes;
-    var time = hours + ':' + minutes + ' ' + ampm;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    var time = hours + ":" + minutes + " " + ampm;
     return time;
   }
 
-  const handlechat = chatroomId => {
+  const handlechat = (chatroomId) => {
     console.log(chatroomId);
-    navigation.navigate('Chat', {docid: chatroomId});
+    navigation.navigate("Chat", { docid: chatroomId });
   };
 
   useEffect(() => {
     async function fromChat() {
       let arr = [];
-      console.log('START');
+      console.log("START");
       try {
         await firebase
           .firestore()
-          .collection('chatroom')
-          .where('participantId', 'array-contains', auth().currentUser.uid)
-          .onSnapshot(querySnapshot => {
+          .collection("chatroom")
+          .where("participantId", "array-contains", auth().currentUser.uid)
+          .onSnapshot((querySnapshot) => {
             let user0, user1;
             arr = [];
-            querySnapshot.forEach(documentSnapshot => {
+            querySnapshot.forEach((documentSnapshot) => {
               let chatData = {};
               chatData.chatroomId = documentSnapshot.id;
-              console.log('Chat Room ID:: ', chatData.chatroomId);
+              console.log("Chat Room ID:: ", chatData.chatroomId);
 
-              user0 = documentSnapshot.data()['participantId'][0];
-              user1 = documentSnapshot.data()['participantId'][1];
+              user0 = documentSnapshot.data()["participantId"][0];
+              user1 = documentSnapshot.data()["participantId"][1];
               if (auth().currentUser.uid != user0) {
                 chatData.userId = user0;
               } else {
                 chatData.userId = user1;
               }
 
-              console.log('USER ID:: ', chatData.userId);
+              console.log("USER ID:: ", chatData.userId);
 
-              getUserData(chatData.userId).then(item => {
+              getUserData(chatData.userId).then((item) => {
                 chatData.name = item.name;
                 chatData.image = item.image;
 
-                console.log('Name ::', chatData.name);
-                console.log('Image ::', chatData.image);
+                console.log("Name ::", chatData.name);
+                console.log("Image ::", chatData.image);
 
                 let time1 = documentSnapshot.data().latestTime;
                 let time2 = new Date(time1 * 1000);
                 chatData.lastTime = convertTime(time2);
-                console.log('Last Time:: ', chatData.lastTime);
+                console.log("Last Time:: ", chatData.lastTime);
 
                 chatData.lastMessage = documentSnapshot.data().latestMessages;
-                console.log('Last Message:: ', chatData.lastMessage);
-                console.log('====================================');
+                console.log("Last Message:: ", chatData.lastMessage);
+                console.log("====================================");
 
-                setChatData({chatData: chatData});
+                setChatData({ chatData: chatData });
 
-                arr.push({...chatData});
+                arr.push({ ...chatData });
               });
             });
             setChatDataArray(arr);
-            console.log('Chat Data Array:: ', chatDataArray);
+            console.log("Chat Data Array:: ", chatDataArray);
           });
       } catch (error) {
-        console.log('Error trying to get data from chatroom::', error);
+        console.log("Error trying to get data from chatroom::", error);
       }
     }
 
     fromChat();
   }, []);
 
-  const getUserData = async id => {
+  const getUserData = async (id) => {
     const data = {};
     try {
       await firebase
         .firestore()
-        .collection('users')
+        .collection("users")
         .doc(id)
         .get()
-        .then(docRef => {
-          data.name = docRef.data().firstName + ' ' + docRef.data().lastName;
+        .then((docRef) => {
+          data.name = docRef.data().firstName + " " + docRef.data().lastName;
           data.image = docRef.data().photoURL;
         });
-      console.log('Name from function::: ', data.name);
+      console.log("Name from function::: ", data.name);
       return data;
     } catch (error) {
       console.log(error);
     }
   };
 
-  const ChatListItem = item => {
+  const ChatListItem = ({ item }) => {
     return (
       <View>
-        <View style={{marginTop: 20}}>
+        <View style={{ marginTop: 20 }}>
           <TouchableOpacity
             onPress={() => {
               handlechat(item.chatroomId);
-            }}>
+            }}
+          >
             <View
               style={{
-                flexDirection: 'row',
+                flexDirection: "row",
                 paddingHorizontal: 20,
                 paddingVertical: 20,
-                alignItems: 'center',
-              }}>
-              <View style={{marginRight: 40}}>
+                alignItems: "center",
+              }}
+            >
+              <View style={{ marginRight: 40 }}>
                 <Image
                   source={
                     item?.image
-                      ? {uri: item.image}
-                      : require('../../images/default_image.png')
+                      ? { uri: item.image }
+                      : require("../../images/default_image.png")
                   }
-                  style={{width: 50, height: 50, borderRadius: 100}}
+                  style={{ width: 50, height: 50, borderRadius: 100 }}
                 />
               </View>
-              <View style={{flexDirection: 'column'}}>
+              <View style={{ flexDirection: "column" }}>
                 <Text
                   style={{
                     fontSize: 16,
-                    fontWeight: 'bold',
-                    color: '#000000',
+                    fontWeight: "bold",
+                    color: "#000000",
                     marginBottom: 5,
-                  }}>
+                  }}
+                >
                   {item.name}
                 </Text>
-                <Text style={{fontSize: 16, color: '#91918e'}}>
+                <Text style={{ fontSize: 16, color: "#91918e" }}>
                   {item.lastMessage}
                 </Text>
               </View>
               <Text
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   top: 22,
                   right: 25,
                   fontSize: 13,
-                  fontWeight: 'bold',
-                  color: '#4F3B70',
-                }}>
+                  fontWeight: "bold",
+                  color: "#4F3B70",
+                }}
+              >
                 {item.lastTime}
               </Text>
             </View>
@@ -309,22 +313,20 @@ const MessagesScreen = ({navigation}) => {
     );
   };
   return (
-    <View style={{backgroundColor: '#4F3B70'}}>
-      <View style={{padding: 20}}>
-        <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold'}}>
+    <View style={{ backgroundColor: "#4F3B70" }}>
+      <View style={{ padding: 20 }}>
+        <Text style={{ fontSize: 32, color: "white", fontWeight: "bold" }}>
           My Chatlists
         </Text>
       </View>
       <View
         style={{
-          backgroundColor: '#ffffff',
+          backgroundColor: "#ffffff",
           borderTopRightRadius: 40,
           borderTopLeftRadius: 40,
-        }}>
-        <FlatList
-          data={chatDataArray}
-          renderItem={ChatListItem}
-        />
+        }}
+      >
+        <FlatList data={chatDataArray} renderItem={ChatListItem} />
       </View>
     </View>
   );
