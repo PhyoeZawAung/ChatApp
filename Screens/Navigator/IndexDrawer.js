@@ -17,7 +17,7 @@ function IndexScreen() {
             <TouchableOpacity onPress={() => navigation.navigate('search')}>
               <Icon
                 name="search"
-                color="blue"
+                color="#4F3B70"
                 style={{marginRight: 20, fontSize: 20}}
               />
             </TouchableOpacity>
