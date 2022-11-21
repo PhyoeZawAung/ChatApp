@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, Image, FlatList, Button, Alert} from 'react-native';
+import {View, Text, Image, FlatList, Button, Alert, ToastAndroid} from 'react-native';
 import {Avatar, Icon} from '@rneui/base';
 import {
   TextInput,
@@ -18,17 +18,27 @@ export default function AddScreen({navigation}) {
   const date = new Date();
 
   const ref = firebase.firestore().collection('group');
-  function create({groupName, groupMember}) {
+  function create({ groupName, groupMember }) {
+    if (typeof (groupName) == "undefined") {
+      alert("Plaease Set Group Name");
+      ToastAndroid.showWithGravity(
+        "Plaease Set Group Name",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      )
+      return false;
+    }
     ref
       .add({
         groupName,
+        admin: user1,
         groupMember,
         latestTime: date,
         latestMessage: 'Group created',
       })
       .then(doc => {
-        const docid = doc.id;
-        navigation.navigate('Groupchat', {docid});
+        const groupId = doc.id;
+        navigation.navigate('Groupchat', {groupId,groupName});
         console.log(doc.id);
       });
   }
@@ -81,7 +91,7 @@ export default function AddScreen({navigation}) {
           alignItems: 'center',
         }}>
         <TextInput
-          style={{marginLeft: 40, width: '70%', color: '#ffffff'}}
+          style={{marginLeft: 40, width: '70%', color: '#ffffff',borderBottomWidth:1,borderBottomColor:"grey"}}
           onChangeText={newText => setgroupName(newText)}
           value={groupName}
           placeholder="Name your group"

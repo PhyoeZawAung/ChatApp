@@ -6,9 +6,10 @@ import {
   Pressable,
   StyleSheet,
   ToastAndroid,
+  TouchableOpacity,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import {Dialog} from '@rneui/base';
+import {Dialog,Icon} from '@rneui/base';
 
 const LoginScreen = ({navigation}) => {
   const [showhide, setShowHide] = useState(true);
@@ -113,18 +114,20 @@ const LoginScreen = ({navigation}) => {
               }}
               secureTextEntry={showhide}
             />
-            <Pressable
+            <TouchableOpacity
               onPress={() => {
                 setShowHide(Show(showhide));
               }}>
-              <Text style={styles.showhidebutton}>
-                {showhide ? 'Show' : 'Hide'}
-              </Text>
-            </Pressable>
+               <View style={styles.showhidebutton}>
+                  <Icon name={showhide ? 'eye-off' : 'eye'} type="feather" size={20}>
+                    
+                  </Icon>
+                  </View>
+            </TouchableOpacity>
             </View>
             </View>
           <View>
-          <Pressable
+          <TouchableOpacity
             style={styles.button}
             onPress={() => {
               console.log('Press login');
@@ -132,13 +135,13 @@ const LoginScreen = ({navigation}) => {
               //navigation.navigate("Messages");
             }}>
             <Text style={{color: '#fff', fontWeight: 'bold'}}>LOGIN</Text>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             onPress={() => {
               navigation.navigate('Forgot');
             }}>
             <Text style={[styles.text, {color: '#bf9bfa'}]}>Forgotten Password?</Text>
-            </Pressable>
+            </TouchableOpacity>
             </View>
 
           
@@ -165,12 +168,12 @@ const LoginScreen = ({navigation}) => {
       <View>
             <View style={styles.signup}>
               <Text style={styles.text}>New User? </Text>
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   navigation.navigate('SignUp');
                 }}>
                 <Text style={styles.signUpText}>Sign Up</Text>
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </View>
       
@@ -226,18 +229,22 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     paddingLeft: 20,
+
   },
   showhidebutton: {
     color: '#3fb585',
     paddingRight: 20,
   },
   button: {
-    width: 300,
+    width: "100%",
     backgroundColor: '#3fb585',
     marginVertical: 10,
     alignItems: 'center',
     borderRadius: 20,
     padding: 16,
   },
+  inputField: {
+    width:"80%"
+  }
 });
 export default LoginScreen;

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 
-import {View, Text, TextInput, Pressable, StyleSheet, ToastAndroid} from 'react-native';
+import {View, Text, TextInput, Pressable, StyleSheet, ToastAndroid,TouchableOpacity} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {Dialog} from '@rneui/base';
 const ForgotScreen = ({navigation}) => {
@@ -46,18 +46,18 @@ const ForgotScreen = ({navigation}) => {
             onChangeText={text => setEmail(text)}
           />
 
-          <Pressable
+          <TouchableOpacity
             style={styles.button}
             onPress={() => {
               Forgot(email);
             }}>
             <Text style={{color: '#fff', fontWeight: 'bold'}}>Send Link</Text>
-          </Pressable>
+          </TouchableOpacity>
           <Dialog overlayStyle={{backgroundColor: '#fff'}} isVisible={visible}>
             <Dialog.Title title="Password Reset Mail Send"></Dialog.Title>
             <Text>Please Check Your Gmail And Click the link.</Text>
             <Text>If you don't find any mail check in your spam folder</Text>
-            <Pressable
+            <TouchableOpacity
               style={styles.button}
               onPress={() => {
                 navigation.navigate('Login');
@@ -66,7 +66,7 @@ const ForgotScreen = ({navigation}) => {
               <Text style={{color: '#fff', fontWeight: 'bold'}}>
                 go to login
               </Text>
-            </Pressable>
+            </TouchableOpacity>
           </Dialog>
           <Dialog isVisible={loading} overlayStyle={{ backgroundColor: "#fff" }}>
             <Dialog.Loading/>
@@ -78,7 +78,7 @@ const ForgotScreen = ({navigation}) => {
 };
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#9b5de0',
+    backgroundColor: '#4F3B70',
     flex: 1,
     padding: 30,
   },
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
 
   button: {
     width: '100%',
-    backgroundColor: '#e211d1',
+    backgroundColor: '#3fb585',
     marginVertical: 10,
     alignItems: 'center',
     borderRadius: 20,
