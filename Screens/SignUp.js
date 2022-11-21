@@ -8,16 +8,18 @@ import {
   Pressable,
   StyleSheet,
   ToastAndroid,
+  TouchableOpacity
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {Formik} from 'formik';
 import * as yup from 'yup';
 import firestore from '@react-native-firebase/firestore';
-import {Dialog} from '@rneui/base';
+import {Dialog, Icon} from '@rneui/base';
 
 const SignUpScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
-  const [showhide, setShowHide] = useState(true);
+  const [showhidePassword, setShowHidePassword] = useState(true);
+  const [showhideConfirmPassword, setShowHideConfirmPassword] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
   const [showError, setShowError] = useState(false);
 
@@ -155,16 +157,18 @@ const SignUpScreen = ({navigation}) => {
                   onChangeText={props.handleChange('password')}
                   onBlur={props.handleBlur('password')}
                   value={props.values.password}
-                  secureTextEntry={showhide}
+                  secureTextEntry={showhidePassword}
                 />
-                <Pressable
+                <TouchableOpacity
                   onPress={() => {
-                    setShowHide(Show(showhide));
+                    setShowHidePassword(Show(showhidePassword));
                   }}>
-                  <Text style={styles.showhidebutton}>
-                    {showhide ? 'Show' : 'Hide'}
-                  </Text>
-                </Pressable>
+                   <View style={styles.showhidebutton}>
+                  <Icon name={showhidePassword ? 'eye-off' : 'eye'} type="feather" size={20}>
+                    
+                    </Icon>
+                  </View>
+                </TouchableOpacity>
               </View>
               {props.touched.password && props.errors.password ? (
                 <Text style={styles.error}>{props.errors.password}</Text>
@@ -177,21 +181,23 @@ const SignUpScreen = ({navigation}) => {
                   onChangeText={props.handleChange('retypePassword')}
                   onBlur={props.handleBlur('retypePassword')}
                   value={props.values.retypePassword}
-                  secureTextEntry={showhide}
+                  secureTextEntry={showhideConfirmPassword}
                 />
-                <Pressable
+                <TouchableOpacity
                   onPress={() => {
-                    setShowHide(Show(showhide));
+                    setShowHideConfirmPassword(Show(showhideConfirmPassword));
                   }}>
-                  <Text style={styles.showhidebutton}>
-                    {showhide ? 'Show' : 'Hide'}
-                  </Text>
-                </Pressable>
+                  <View style={styles.showhidebutton}>
+                  <Icon name={showhideConfirmPassword ? 'eye-off' : 'eye'} type="feather" size={20}>
+                    
+                  </Icon>
+                  </View>
+                </TouchableOpacity>
               </View>
               {props.touched.retypePassword && props.errors.retypePassword ? (
                 <Text style={styles.error}>{props.errors.retypePassword}</Text>
               ) : null}
-              <Pressable
+              <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
                   console.log('press');
@@ -200,7 +206,7 @@ const SignUpScreen = ({navigation}) => {
                 <Text style={{color: '#fff', fontWeight: 'bold'}}>
                   Register
                 </Text>
-              </Pressable>
+              </TouchableOpacity>
             </View>
           )}
         </Formik>
@@ -213,7 +219,7 @@ const SignUpScreen = ({navigation}) => {
           onBackdropPress={toggleError}>
           <Dialog.Title title={errorMsg} />
           <Dialog.Actions>
-            <Pressable
+            <TouchableOpacity
               style={styles.button}
               onPress={() => {
                 navigation.navigate('Login');
@@ -222,8 +228,8 @@ const SignUpScreen = ({navigation}) => {
               <Text style={{color: '#fff', fontWeight: 'bold'}}>
                 Try login
               </Text>
-            </Pressable>
-            <Pressable
+            </TouchableOpacity>
+            <TouchableOpacity
               style={styles.button}
               onPress={() => {
                 navigation.navigate('Forgot');
@@ -232,7 +238,7 @@ const SignUpScreen = ({navigation}) => {
               <Text style={{color: '#fff', fontWeight: 'bold'}}>
                 Forgot password
               </Text>
-            </Pressable>
+            </TouchableOpacity>
           </Dialog.Actions>
         </Dialog>
       </View>
@@ -306,5 +312,8 @@ const styles = StyleSheet.create({
     color: '#f00',
     fontSize: 12,
   },
+  inputField: {
+    width:"80%"
+  }
 });
 export default SignUpScreen;

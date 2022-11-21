@@ -8,11 +8,13 @@ import {
   Pressable,
   StyleSheet,
   ToastAndroid,
+  TouchableOpacity,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {Formik} from 'formik';
 import * as yup from 'yup';
 import firestore from '@react-native-firebase/firestore';
+import { Icon } from '@rneui/base';
 
 const ChangePasswordScreen = ({navigation}) => {
   const [user, setUser] = useState();
@@ -40,7 +42,9 @@ const ChangePasswordScreen = ({navigation}) => {
     console.log(user);
   }, []);
 
-  const [showhide, setShowHide] = useState(true);
+  const [showhideCurrentPassword, setShowHideCurrentPassword] = useState(true);
+  const [showhideNewPassword, setShowHideNewPassword] = useState(true);
+  const [showhideConfirmPassword, setShowHideConfirmPassword] = useState(true);
   
 
   const Show = showhide => {
@@ -120,16 +124,18 @@ const ChangePasswordScreen = ({navigation}) => {
                   onChangeText={props.handleChange('oldPassword')}
                   onBlur={props.handleBlur('oldPassword')}
                   value={props.values.oldPassword}
-                  secureTextEntry={showhide}
+                  secureTextEntry={showhideCurrentPassword}
                 />
-                <Pressable
+                <TouchableOpacity
                   onPress={() => {
-                    setShowHide(Show(showhide));
+                    setShowHideCurrentPassword(Show(showhideCurrentPassword));
                   }}>
-                  <Text style={styles.showhidebutton}>
-                    {showhide ? 'Show' : 'Hide'}
-                  </Text>
-                </Pressable>
+                   <View style={styles.showhidebutton}>
+                  <Icon name={showhideCurrentPassword ? 'eye-off' : 'eye'} type="feather" size={20}>
+                    
+                    </Icon>
+                  </View>
+                </TouchableOpacity>
               </View>
              
              
@@ -140,16 +146,18 @@ const ChangePasswordScreen = ({navigation}) => {
                   onChangeText={props.handleChange('newPassword')}
                   onBlur={props.handleBlur('newPassword')}
                   value={props.values.newPassword}
-                  secureTextEntry={showhide}
+                  secureTextEntry={showhideNewPassword}
                 />
-                <Pressable
+                <TouchableOpacity
                   onPress={() => {
-                    setShowHide(Show(showhide));
+                    setShowHideNewPassword(Show(showhideNewPassword));
                   }}>
-                  <Text style={styles.showhidebutton}>
-                    {showhide ? 'Show' : 'Hide'}
-                  </Text>
-                </Pressable>
+                   <View style={styles.showhidebutton}>
+                  <Icon name={showhideNewPassword ? 'eye-off' : 'eye'} type="feather" size={20}>
+                    
+                    </Icon>
+                  </View>
+                </TouchableOpacity>
               </View>
               {props.touched.newPassword && props.errors.newPassword ? (
                 <Text style={styles.error}>{props.errors.newPassword}</Text>
@@ -162,21 +170,23 @@ const ChangePasswordScreen = ({navigation}) => {
                   onChangeText={props.handleChange('retypePassword')}
                   onBlur={props.handleBlur('retypePassword')}
                   value={props.values.retypePassword}
-                  secureTextEntry={showhide}
+                  secureTextEntry={showhideConfirmPassword}
                 />
-                <Pressable
+                <TouchableOpacity
                   onPress={() => {
-                    setShowHide(Show(showhide));
+                    setShowHideConfirmPassword(Show(showhideConfirmPassword));
                   }}>
-                  <Text style={styles.showhidebutton}>
-                    {showhide ? 'Show' : 'Hide'}
-                  </Text>
-                </Pressable>
+                  <View style={styles.showhidebutton}>
+                  <Icon name={showhideConfirmPassword ? 'eye-off' : 'eye'} type="feather" size={20}>
+                    
+                    </Icon>
+                  </View>
+                </TouchableOpacity>
               </View>
               {props.touched.retypePassword && props.errors.retypePassword ? (
                 <Text style={styles.error}>{props.errors.retypePassword}</Text>
               ) : null}
-              <Pressable
+              <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
                   console.log('press');
@@ -185,7 +195,7 @@ const ChangePasswordScreen = ({navigation}) => {
                 <Text style={{color: '#fff', fontWeight: 'bold'}}>
                   Submit
                 </Text>
-              </Pressable>
+              </TouchableOpacity>
             </View>
           )}
         </Formik>
@@ -195,7 +205,7 @@ const ChangePasswordScreen = ({navigation}) => {
 };
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#9b5de0',
+    backgroundColor: '#4F3B70',
     flex: 1,
     padding: 30,
   },
@@ -248,7 +258,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '100%',
-    backgroundColor: '#e211d1',
+    backgroundColor: '#3fb585',
     marginVertical: 10,
     alignItems: 'center',
     borderRadius: 20,
@@ -258,5 +268,8 @@ const styles = StyleSheet.create({
     color: '#f00',
     fontSize: 12,
   },
+  inputField: {
+    width:"80%"
+  }
 });
 export default ChangePasswordScreen;

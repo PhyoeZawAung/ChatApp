@@ -242,16 +242,7 @@ const GroupInfoScreen = ({navigation}) => {
   if (admin === user) {
     return (
       <View style={styles.container}>
-        <Text
-          style={{
-            color: '#fff',
-            paddingBottom: 5,
-            textDecorationLine: 'underline',
-            textDecorationColor: 'red',
-            fontStyle: 'italic',
-          }}>
-          You are the Admin of this group
-        </Text>
+       
         <View
           style={{
             alignItems: 'center',
@@ -264,9 +255,10 @@ const GroupInfoScreen = ({navigation}) => {
           />
           <Text style={styles.groupName}>{groupName}</Text>
           <Text style={styles.createdBy}>
-            Created by {adminData[0].firstName + ' ' + adminData[0].lastName}{' '}
+            Created by {adminData[0].firstName + ' ' + adminData[0].lastName}
           </Text>
         </View>
+        
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <TouchableOpacity
             style={styles.buttonAdd}
@@ -326,6 +318,17 @@ const GroupInfoScreen = ({navigation}) => {
         <Text
           style={{
             color: '#fff',
+            paddingBottom: 10,
+            textDecorationLine: 'underline',
+            textDecorationColor: 'red',
+            fontStyle: 'italic',
+        
+          }}>
+          You are the Admin of this group
+        </Text>
+        <Text
+          style={{
+            color: '#fff',
             textDecorationLine: 'underline',
             paddingBottom: 8,
           }}>
@@ -375,7 +378,7 @@ const GroupInfoScreen = ({navigation}) => {
     firestore().collection('group').doc(route.params.groupId).update({
       groupMember: groupMember,
     });
-    navigation.naviagte('Home');
+    navigation.navigate('My Group');
   };
   if (groupName == '') {
     return null;
@@ -394,7 +397,7 @@ const GroupInfoScreen = ({navigation}) => {
         />
         <Text style={styles.groupName}>{groupName}</Text>
         <Text style={styles.createdBy}>
-          Created by {adminData[0].firstName + ' ' + adminData[0].lastName}{' '}
+          Created by {adminData[0].firstName + ' ' + adminData[0].lastName}
         </Text>
       </View>
       <View
@@ -402,24 +405,9 @@ const GroupInfoScreen = ({navigation}) => {
           flexDirection: 'row',
           justifyContent: 'space-between',
         }}>
+        
         <TouchableOpacity
-          style={styles.buttonAdd}
-          onPress={() => {
-            setDialogVisible(true);
-            getAllUsers(userInGroup);
-          }}>
-          <View style={{flexDirection: 'row'}}>
-            <Icon
-              name="addusergroup"
-              type="ant-design"
-              size={20}
-              color={'#fff'}
-            />
-            <Text style={{color: '#fff', paddingLeft: 8}}>Add Members</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.buttonLeave}
+          style={[styles.button, { backgroundColor: "#f00" }]}
           onPress={() => {
             leaveGroup();
           }}>
