@@ -21,7 +21,7 @@ const ContactScreen = ({navigation}) => {
   const [currentUserId, setCurrentUserId] = useState();
   const [loading, setLoading] = useState(true);
   const [chatRooms, setChatRooms] = useState([]);
-
+  const [allUsersBackup, setAllUsersBackup] = useState([]);
   const [username, setusername] = useState();
 
   const date = new Date();
@@ -44,6 +44,7 @@ const ContactScreen = ({navigation}) => {
         });
 
         setAllUsers(user.filter(it => it.key != auth().currentUser.uid));
+        setAllUsersBackup(user.filter(it => it.key != auth().currentUser.uid))
         setLoading(false);
 
         // see next step
@@ -53,8 +54,7 @@ const ContactScreen = ({navigation}) => {
     return () => subscriber();
   }, []);
   const search = text => {
-    let data = allusers;
-    setAllUsers(data.filter(data => data.fullname.includes(text)));
+    setAllUsers(allUsersBackup.filter(it => it.fullname.match(text)));
   };
   const renderItem = ({item}) => {
     return (
@@ -172,13 +172,17 @@ const ContactScreen = ({navigation}) => {
               borderRadius: 20,
               padding: 15,
             }}
-            onChangeText={newText => setusername(newText)}
+            onChangeText={(newText) => {
+             
+              search(newText)
+            }
+            }
             value={username}
             placeholder="Search"
             placeholderTextColor="#000000"
           />
           <TouchableOpacity
-            onPress={() => search(username)}
+            //onPress={() => search(username)}
             style={{
               backgroundColor: '#ffffff',
               width: '11%',
