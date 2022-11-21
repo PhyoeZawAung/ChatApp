@@ -9,7 +9,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native';
-import firestore from '@react-native-firebase/firestore';
+import firestore, {firebase} from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {FlatList} from 'react-native-gesture-handler';
 import ChatScreen from './Chat/Chat';
@@ -20,7 +20,6 @@ const ContactScreen = ({navigation}) => {
   const [currentUserId, setCurrentUserId] = useState();
   const [loading, setLoading] = useState(true);
   const [chatRooms, setChatRooms] = useState([]);
-
   const [username, setusername] = useState();
 
   const date = new Date();
@@ -51,8 +50,29 @@ const ContactScreen = ({navigation}) => {
     // Unsubscribe from events when no longer in use
     return () => subscriber();
   }, []);
+  const initialState = [{}];
   const search = text => {
-    let data = allusers;
+    setAllUsers(initialState);
+    console.log(allusers);
+    let searchuser = firebase
+      .firestore()
+      .collection('users')
+      .onSnapshot(querySnapshot => {
+        const user = [];
+        querySnapshot.forEach(documentSnapshot => {
+          user.push({
+            ...documentSnapshot.data(),
+            key: documentSnapshot.id,
+            fullname:
+              documentSnapshot.data().firstName +
+              ' ' +
+              documentSnapshot.data().lastName,
+          });
+        });
+        setAllUsers(user.filter(it => it.key != auth().currentUser.uid));
+        setLoading(false);
+      });
+    data = allusers;
     setAllUsers(data.filter(data => data.fullname.includes(text)));
   };
   const renderItem = ({item}) => {
