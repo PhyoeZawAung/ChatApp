@@ -176,9 +176,13 @@ const MessagesScreen = ({ navigation }) => {
     return time;
   }
 
-  const handlechat = (chatroomId) => {
+  const handlechat = (chatroomId, name, image) => {
     console.log(chatroomId);
-    navigation.navigate('Chat', { docid : chatroomId });
+    navigation.navigate('Chat', { 
+      docid : chatroomId,
+      name : name,
+      image: image,
+    });
   }
 
   useEffect(() => {
@@ -208,14 +212,14 @@ const MessagesScreen = ({ navigation }) => {
                 chatData.userId = user1;
               }
 
-              console.log("USER ID:: ", chatData.userId);
+              console.log("User id:: ", chatData.userId);
 
               getUserData(chatData.userId).then(item => {
                 chatData.name = item.name;
                 chatData.image = item.image;
 
-                console.log("Name ::", chatData.name);
-                console.log("Image ::", chatData.image);
+                console.log("Name:: ", chatData.name);
+                console.log("Image:: ", chatData.image);
 
                 let time1 = documentSnapshot.data().latestTime
                 let time2 = new Date(time1 * 1000);

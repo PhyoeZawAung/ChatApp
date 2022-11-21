@@ -303,11 +303,10 @@ function ChatScreen({ navigation }) {
    
   }
   return (
-    
-      
-    <GiftedChat
+
+      <GiftedChat
       renderActions={customRenderAction}
-      renderComposer={props1 => (<Composer {...props1} textInputStyle={{ color: "blue" }} />)}
+      renderComposer={props1 => (<Composer {...props1} textInputStyle={{ color: "#4F3B70" }} />)}
       messages={messages}
       showAvatarForEveryMessage={true}
       onSend={messages => onSend(messages)}
@@ -319,11 +318,12 @@ function ChatScreen({ navigation }) {
       }}
       renderMessageImage = {customRenderMessageImage}
      
-    >
-      
-      
+    >  
 
       </GiftedChat>
+
+      
+    
     
    
   );

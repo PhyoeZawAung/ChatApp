@@ -4,6 +4,7 @@ import MessagesScreen from '../Chat/MessagesScreen';
 import ChatScreen from '../Chat/Chat';
 import SearchScreen from '../Chat/Search';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {OneChatHeader} from '../../components/OneChatHeader';
 
 const HomeStack = createStackNavigator();
 function IndexScreen() {
@@ -23,7 +24,14 @@ function IndexScreen() {
             </TouchableOpacity>
           ),
         })}></HomeStack.Screen>
-      <HomeStack.Screen name="Chat" component={ChatScreen}></HomeStack.Screen>
+      <HomeStack.Screen name="Chat" component={ChatScreen}
+        options= {({navigation,route}) => ({
+          header: () => <OneChatHeader 
+            image={route.params.image} 
+            name={route.params.name}
+            status={route.params.status} />
+        })}
+      ></HomeStack.Screen>
       <HomeStack.Screen
         name="search"
         component={SearchScreen}
