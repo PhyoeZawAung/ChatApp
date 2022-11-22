@@ -16,6 +16,7 @@ import ChatScreen from '../Chat/ChatScreen';
 import MeScreen from '../Me';
 import Home from './Drawer';
 import IndexScreen from './IndexDrawer';
+import { ActivityIndicator } from 'react-native';
 const Stack = createStackNavigator();
 
 const StackScreen = () => {
@@ -33,7 +34,11 @@ const StackScreen = () => {
     // unsubscribe on unmount
   });
 
-  if (initializing) return null;
+  if (initializing) {
+    return (
+      <ActivityIndicator/>
+    )
+  };
 
   return (
     <Provider store={store}>
