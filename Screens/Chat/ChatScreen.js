@@ -39,7 +39,7 @@ function ChatScreen({navigation}) {
     const Unsubscribe = firebase
       .firestore()
       .collection('group')
-      .doc(route.params.docid)
+      .doc(route.params.groupId)
       .collection('messages')
       .orderBy('createdAt', 'desc')
       .onSnapshot(snapshot =>
@@ -64,7 +64,7 @@ function ChatScreen({navigation}) {
     firebase
       .firestore()
       .collection('group')
-      .doc(route.params.docid)
+      .doc(route.params.groupId)
       .collection('messages')
       .add({
         _id,
@@ -78,7 +78,7 @@ function ChatScreen({navigation}) {
     firebase
       .firestore()
       .collection('group')
-      .doc(route.params.docid)
+      .doc(route.params.groupId)
       .update({
         latestMessages: text,
         latestTime: createdAt,
@@ -114,7 +114,7 @@ function ChatScreen({navigation}) {
         await firebase
           .firestore()
           .collection('group')
-          .doc(route.params.docid)
+          .doc(route.params.groupId)
           .collection('messages')
           .add({
             _id: uuid.v4(),
@@ -129,7 +129,7 @@ function ChatScreen({navigation}) {
         await firebase
           .firestore()
           .collection('group')
-          .doc(route.params.docid)
+          .doc(route.params.groupId)
           .update({
             latestMessages: 'Send a photo',
             latestTime: date,
@@ -164,7 +164,7 @@ function ChatScreen({navigation}) {
         await firebase
           .firestore()
           .collection('group')
-          .doc(route.params.docid)
+          .doc(route.params.groupId)
           .collection('messages')
           .add({
             _id: uuid.v4(),
@@ -179,7 +179,7 @@ function ChatScreen({navigation}) {
         await firebase
           .firestore()
           .collection('group')
-          .doc(route.params.docid)
+          .doc(route.params.groupId)
           .update({
             latestMessages: 'Send a photo',
             latestTime: date,

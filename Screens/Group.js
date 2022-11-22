@@ -7,8 +7,8 @@ import auth from '@react-native-firebase/auth';
 export default function MainScreen({navigation}) {
   const [group, setgroup] = useState();
   const ref = firebase.firestore().collection('group');
-  const chatroom = docid => {
-    navigation.navigate('Groupchat', {docid});
+  const chatroom = (groupId ,groupName)=> {
+    navigation.navigate('Groupchat', {groupId,groupName});
   };
   const getGroup = ref
     .where('groupMember', 'array-contains', auth().currentUser.uid)
@@ -44,7 +44,7 @@ export default function MainScreen({navigation}) {
           data={group}
           renderItem={({item}) => (
             <View>
-              <TouchableOpacity onPress={() => chatroom(item.id)}>
+              <TouchableOpacity onPress={() => chatroom(item.id,item.groupName)}>
                 <View
                   style={{
                     flexDirection: 'row',

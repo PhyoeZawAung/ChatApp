@@ -6,18 +6,22 @@ import {
   TouchableOpacity,
   ScrollView,
   Button,
+  TextInput,
   ActivityIndicator,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {FlatList} from 'react-native-gesture-handler';
 import ChatScreen from './Chat/Chat';
+import {Icon} from '@rneui/base';
 
 const ContactScreen = ({navigation}) => {
   const [allusers, setAllUsers] = useState([]);
   const [currentUserId, setCurrentUserId] = useState();
   const [loading, setLoading] = useState(true);
   const [chatRooms, setChatRooms] = useState([]);
+
+  const [username, setusername] = useState();
 
   const date = new Date();
 
@@ -28,9 +32,13 @@ const ContactScreen = ({navigation}) => {
       .onSnapshot(querySnapshot => {
         const user = [];
         querySnapshot.forEach(documentSnapshot => {
-          user.push({ 
+          user.push({
             ...documentSnapshot.data(),
             key: documentSnapshot.id,
+            fullname:
+              documentSnapshot.data().firstName +
+              ' ' +
+              documentSnapshot.data().lastName,
           });
         });
 
@@ -39,10 +47,14 @@ const ContactScreen = ({navigation}) => {
 
         // see next step
       });
-  
+
     // Unsubscribe from events when no longer in use
     return () => subscriber();
   }, []);
+  const search = text => {
+    let data = allusers;
+    setAllUsers(data.filter(data => data.fullname.includes(text)));
+  };
   const renderItem = ({item}) => {
     return (
       <View>
@@ -54,7 +66,7 @@ const ContactScreen = ({navigation}) => {
             backgroundColor: '#ffffff',
             marginHorizontal: 20,
           }}>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => {
               handlechat(item.key);
             }}>
@@ -83,8 +95,7 @@ const ContactScreen = ({navigation}) => {
                     color: '#000000',
                     marginBottom: 5,
                   }}>
-                  {item.firstName + " " +
-                  item.lastName}
+                  {item.firstName + ' ' + item.lastName}
                 </Text>
               </View>
             </View>
@@ -100,7 +111,7 @@ const ContactScreen = ({navigation}) => {
       .then(querySnapshot => {
         let exist = false;
         querySnapshot.forEach(documentSnapshot => {
-          user0 = documentSnapshot.data()['participantId'][0]; 
+          user0 = documentSnapshot.data()['participantId'][0];
           user1 = documentSnapshot.data()['participantId'][1];
 
           if (
@@ -111,7 +122,7 @@ const ContactScreen = ({navigation}) => {
             navigation.navigate('Chat', {docid: documentSnapshot.id});
             exist = true;
             return false;
-          } 
+          }
         });
         if (!exist) {
           firestore()
@@ -146,6 +157,34 @@ const ContactScreen = ({navigation}) => {
         <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold'}}>
           Contacts
         </Text>
+        <View style={{flexDirection: 'row', marginTop: 20}}>
+          <TextInput
+            style={{
+              width: '80%',
+              backgroundColor: '#ffffff',
+              height: 50,
+              borderRadius: 20,
+              padding: 15,
+            }}
+            onChangeText={newText => setusername(newText)}
+            value={username}
+            placeholder="Search"
+            placeholderTextColor="#000000"
+          />
+          <TouchableOpacity
+            onPress={() => search(username)}
+            style={{
+              backgroundColor: '#ffffff',
+              width: '11%',
+              height: 40,
+              right: 0,
+              position: 'absolute',
+              borderRadius: 100,
+              justifyContent: 'center',
+            }}>
+            <Icon name="search" size={30} />
+          </TouchableOpacity>
+        </View>
       </View>
       <FlatList data={allusers} renderItem={renderItem}></FlatList>
     </View>
