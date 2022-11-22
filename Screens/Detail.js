@@ -43,7 +43,6 @@ const DetailScreen = ({ navigation }) => {
           size={100}
           rounded
           source={{ uri: 'https://randomuser.me/api/portraits/women/57.jpg' }}
-          title="Bj"
           containerStyle={{ backgroundColor: 'grey' }}
         >
               <Avatar.Accessory size={35}  

@@ -222,14 +222,14 @@ const ImageUploader = ({navigation}) => {
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
-        <Text style={styles.header}>Welcome {firstName + ' ' + lastName}</Text>
+        <Text style={styles.header}>Welcome... </Text>
+        
         <View style={styles.profile}>
           {image != null ? (
             <Avatar
               size={100}
               rounded
               source={{uri: image.assets[0].uri}}
-              title="PF"
               containerStyle={{backgroundColor: 'grey'}}>
               <Avatar.Accessory
                 size={35}
@@ -243,7 +243,7 @@ const ImageUploader = ({navigation}) => {
               size={100}
               rounded
               title={firstName[0] + lastName[0]}
-              containerStyle={{backgroundColor: 'grey'}}>
+              containerStyle={{backgroundColor: '#3fb585'}}>
               <Avatar.Accessory
                 size={35}
                 onPress={() => {
@@ -317,7 +317,7 @@ const ImageUploader = ({navigation}) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#9b5de0',
+    backgroundColor: '#4F3B70',
     flex: 1,
     padding: 30,
     alignItems: 'center',
@@ -331,8 +331,8 @@ const styles = StyleSheet.create({
   header: {
     fontWeight: 'bold',
     fontSize: 35,
-    color: '#fff',
-    paddingVertical: 16,
+    color: '#53dba4',
+    paddingVertical: 10,
   },
   profile: {
     alignItems: 'center',
@@ -341,10 +341,11 @@ const styles = StyleSheet.create({
     fontSize: 35,
     fontWeight: 'bold',
     color: '#fff',
+    marginTop: 20,
   },
   button: {
     width: '100%',
-    backgroundColor: '#e211d1',
+    backgroundColor: '#3fb585',
     marginVertical: 10,
     alignItems: 'center',
     borderRadius: 20,

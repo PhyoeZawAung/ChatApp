@@ -7,7 +7,8 @@ import auth from "@react-native-firebase/auth";
 import { FlatList } from "react-native-gesture-handler";
 import database from "@react-native-firebase/database";
 import { ref } from "yup";
-import { Avatar } from "@rneui/base";
+import {Avatar, Dialog} from '@rneui/base';
+
 const MessagesScreen = ({ navigation }) => {
   const [chatData, setChatData] = useState([]);
   const [chatDataArray, setChatDataArray] = useState([]);
@@ -24,13 +25,14 @@ const MessagesScreen = ({ navigation }) => {
     return time;
   }
 
-  const handlechat = (chatroomId, name, image) => {
+  const handlechat = (chatroomId, firstName, lastName, image, status) => {
     console.log(chatroomId);
     navigation.navigate('Chat', {
       docid: chatroomId,
-      name: name,
+      firstName: firstName,
+      lastName: lastName,
       image: image,
-      
+      status: status,
     });
   }
 
@@ -127,7 +129,7 @@ const MessagesScreen = ({ navigation }) => {
         <View>
           <TouchableOpacity
             onPress={() => {
-              handlechat(item.chatRoomId);
+              handlechat(item.chatRoomId, item.firstName, item.lastName, item.image, item.status);
             }}
           >
             <View
@@ -166,8 +168,8 @@ const MessagesScreen = ({ navigation }) => {
               <View style={{ flexDirection: "column" }}>
                 <Text
                   style={{
-                    fontSize: 16,
-                    
+                    fontSize: 18,
+                    fontWeight: '700',
                     color: "#606060",
                     marginBottom: 5,
                   }}
@@ -185,23 +187,12 @@ const MessagesScreen = ({ navigation }) => {
                   top: 22,
                   right: 25,
                   fontSize: 13,
-                  fontWeight: "bold",
+                  fontWeight: "600",
                   color: "#606060",
                 }}
               >
                 {item.lastTime}
               </Text>
-              <Text
-                style={{
-                  position: "absolute",
-                  top: 50,
-                  right: 25,
-                  fontSize: 13,
-                  fontWeight: "300",
-                  color: "#4F3B70",
-                }}
-              >
-                abc </Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -210,7 +201,10 @@ const MessagesScreen = ({ navigation }) => {
   };
   if (loading) {
     return (
-      <ActivityIndicator/>
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <ActivityIndicator size="small"/>
+      <Text style={{fontSize: 20, color: '#4F3B70', fontWeight: '700'}}>loading chat...</Text>
+    </View>
     )
   }
   return (
