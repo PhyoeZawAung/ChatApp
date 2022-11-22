@@ -5,9 +5,10 @@ import ChatScreen from '../Chat/Chat';
 import SearchScreen from '../Chat/Search';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+
 const HomeStack = createStackNavigator();
 function IndexScreen() {
-  return (
+return (
     <HomeStack.Navigator>
       <HomeStack.Screen
         name="Messages"

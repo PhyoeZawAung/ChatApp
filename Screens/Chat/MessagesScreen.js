@@ -153,7 +153,8 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import firestore, { firebase } from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import { FlatList } from "react-native-gesture-handler";
-
+import database from "@react-native-firebase/database";
+import { ref } from "yup";
 const MessagesScreen = ({ navigation }) => {
   const [chatData, setChatData] = useState({});
   const [chatDataArray, setChatDataArray] = useState([]);
@@ -175,9 +176,38 @@ const MessagesScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
+    console.log('START');
+    const isOfflineForDatabase = {
+      state: 'offline',
+      last_changed: firebase.database.ServerValue.TIMESTAMP,
+    };
+
+    const isOnlineForDatabase = {
+      state: 'online',
+      last_changed: firebase.database.ServerValue.TIMESTAMP,
+    };
+    const userId = auth().currentUser.uid;
+
+    const reference = database().ref(`/status/${userId}`);
+    database()
+      .ref('.info/connected')
+      .on('value', snapshot => {
+        console.log(snapshot.val());
+        if (snapshot.val() == false) {
+          reference.set(isOfflineForDatabase);
+          return;
+        }
+        reference
+          .onDisconnect()
+          .set(isOfflineForDatabase)
+          .then(() => {
+            console.log('disconnected function set');
+            reference.set(isOnlineForDatabase);
+          });
+      });
     async function fromChat() {
       let arr = [];
-      console.log("START");
+      console.log('start')
       try {
         await firebase
           .firestore()
