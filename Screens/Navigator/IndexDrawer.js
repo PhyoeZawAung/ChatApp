@@ -7,9 +7,10 @@ import { Button, Icon, Avatar } from '@rneui/base';
 //import Icon from 'react-native-vector-icons/FontAwesome';
 //import {OneChatHeader} from '../../components/OneChatHeader';
 
+
 const HomeStack = createStackNavigator();
 function IndexScreen() {
-  return (
+return (
     <HomeStack.Navigator>
       <HomeStack.Screen
         name="Messages"
@@ -41,7 +42,7 @@ function IndexScreen() {
               </View>
               <View style={styles.text}>
                 <Text style={styles.name}>{route.params.name}</Text>
-                <Text style={styles.status}>online</Text>
+                <Text style={styles.status}></Text>
               </View>
             </View>
           )

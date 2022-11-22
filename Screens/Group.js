@@ -24,7 +24,7 @@ export default function MainScreen({navigation}) {
           doc.data().latestTime.toDate().getMinutes();
         group.push(mygroup);
       });
-      setgroup([...group, group]);
+      setgroup([...group]);
     });
 
   return (

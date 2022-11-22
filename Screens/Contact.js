@@ -8,6 +8,7 @@ import {
   Button,
   TextInput,
   ActivityIndicator,
+  Pressable
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -20,7 +21,7 @@ const ContactScreen = ({navigation}) => {
   const [currentUserId, setCurrentUserId] = useState();
   const [loading, setLoading] = useState(true);
   const [chatRooms, setChatRooms] = useState([]);
-
+  const [allUsersBackup, setAllUsersBackup] = useState([]);
   const [username, setusername] = useState();
 
   const date = new Date();
@@ -43,6 +44,7 @@ const ContactScreen = ({navigation}) => {
         });
 
         setAllUsers(user.filter(it => it.key != auth().currentUser.uid));
+        setAllUsersBackup(user.filter(it => it.key != auth().currentUser.uid))
         setLoading(false);
 
         // see next step
@@ -52,8 +54,7 @@ const ContactScreen = ({navigation}) => {
     return () => subscriber();
   }, []);
   const search = text => {
-    let data = allusers;
-    setAllUsers(data.filter(data => data.fullname.includes(text)));
+    setAllUsers(allUsersBackup.filter(it => it.fullname.match(text)));
   };
   const renderItem = ({item}) => {
     return (
@@ -152,9 +153,14 @@ const ContactScreen = ({navigation}) => {
     return <ActivityIndicator />;
   }
   return (
-    <View style={{backgroundColor: '#4F3B70', flex: 1}}>
-      <View style={{padding: 20}}>
-        <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold'}}>
+    <View style={{ backgroundColor: '#4F3B70', flex: 1 }}>
+      
+      <View style={{ padding: 20 }}>
+        <Pressable style={{ position: 'absolute', left: 20, top: 30 }}
+      onPress={()=>navigation.goBack()}>
+        <Icon name="arrowleft" type="ant-design" size={30} color={ "#fff"} />
+      </Pressable>
+        <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold',marginLeft:60}}>
           Contacts
         </Text>
         <View style={{flexDirection: 'row', marginTop: 20}}>
@@ -166,13 +172,17 @@ const ContactScreen = ({navigation}) => {
               borderRadius: 20,
               padding: 15,
             }}
-            onChangeText={newText => setusername(newText)}
+            onChangeText={(newText) => {
+             
+              search(newText)
+            }
+            }
             value={username}
             placeholder="Search"
             placeholderTextColor="#000000"
           />
           <TouchableOpacity
-            onPress={() => search(username)}
+            //onPress={() => search(username)}
             style={{
               backgroundColor: '#ffffff',
               width: '11%',

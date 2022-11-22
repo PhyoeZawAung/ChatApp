@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { Text, View, Image, StyleSheet, Pressable, ToastAndroid } from 'react-native';
+import { Text, View, Image, StyleSheet, Pressable, ToastAndroid, TouchableOpacity} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { Avatar, Dialog, Button, Icon } from '@rneui/base';
 import { TextInput } from 'react-native-gesture-handler';
@@ -224,6 +224,10 @@ const MeScreen = ({ navigation }) => {
   }
   return (
     <View style={styles.container}>
+      <Pressable style={{ position: 'absolute', left: 20, top: 20 }}
+      onPress={()=>navigation.goBack()}>
+        <Icon name="arrowleft" type="ant-design" size={30} color={ "#fff"} />
+      </Pressable>
       {userPhoto != null ? (
         <Avatar
           size={100}
@@ -261,7 +265,7 @@ const MeScreen = ({ navigation }) => {
         overlayStyle={{ backgroundColor: '#fff', borderRadius: 10 }}>
         <Dialog.Title title="Pick An Option" />
 
-        <Pressable
+        <TouchableOpacity
           style={styles.button}
           onPress={() => {
             console.log('Camera Open');
@@ -269,8 +273,8 @@ const MeScreen = ({ navigation }) => {
             getImageFromCamera();
           }}>
           <Text style={{ color: '#fff', fontWeight: 'bold' }}>Open Camera</Text>
-        </Pressable>
-        <Pressable
+        </TouchableOpacity>
+        <TouchableOpacity
           style={styles.button}
           onPress={() => {
             console.log('Choose from gallery');
@@ -280,22 +284,26 @@ const MeScreen = ({ navigation }) => {
           <Text style={{ color: '#fff', fontWeight: 'bold' }}>
             Choose From Storage
           </Text>
-        </Pressable>
-        <Pressable
+        </TouchableOpacity>
+        <TouchableOpacity
           style={styles.button}
           onPress={() => {
             console.log('cancel the opltion');
             toggleChoice();
           }}>
           <Text style={{ color: '#fff', fontWeight: 'bold' }}>Cancel</Text>
-        </Pressable>
+        </TouchableOpacity>
       </Dialog>
       <Dialog isVisible={loading} overlayStyle={{ backgroundColor: "#fff" }}>
         <Dialog.Title title="Saving.." />
         <Dialog.Loading></Dialog.Loading>
       </Dialog>
-
-      <View style={styles.EditView}>
+    <View style={{
+        flexDirection: 'row',
+        justifyContent: "space-between",
+        width:"100%",
+       }}>
+      <View style={styles.EditViewForName}>
         {editFirstName ? (
           <TextInput
             style={{ borderBottomWidth: 1, width: '80%', borderBottomColor: "#fff" }}
@@ -307,15 +315,15 @@ const MeScreen = ({ navigation }) => {
             <Text style={{ color: '#fff', paddingLeft: 10 }}>{userFirstName}</Text>
           </View>
         )}
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             toggleEditFirstName();
             setUserFirstName(updateUserFirstName);
           }}>
-          {!editFirstName ? <Text style={{color: '#46eeaa'}}>Edit</Text> : <Text>Done</Text>}
-        </Pressable>
+          {!editFirstName ? <Icon name="edit" color={'#fff'} size={20}></Icon> : <Icon name="done" size={20} color={'#fff'}/>}
+        </TouchableOpacity>
       </View>
-      <View style={styles.EditView}>
+      <View style={styles.EditViewForName}>
         {editLastName ? (
           <TextInput
             style={{ borderBottomWidth: 1, width: '80%', borderBottomColor: "#fff" }}
@@ -323,17 +331,18 @@ const MeScreen = ({ navigation }) => {
             onChangeText={text => setUpdateUserLastName(text)}></TextInput>
         ) : (
           <View style={{ flexDirection: 'row' }}>
-            <Icon name="person" color={'#fff'} />
+            
             <Text style={{ color: '#fff', paddingLeft: 10 }}>{userLastName}</Text>
           </View>
         )}
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             toggleEditLastName();
             setUserLastName(updateUserLastName);
           }}>
-          {!editLastName ? <Text style={{color: '#46eeaa'}}>Edit</Text> : <Text>Done</Text>}
-        </Pressable>
+            {!editLastName ? <Icon name="edit" color={'#fff'} size={20}></Icon> : <Icon name="done" size={20} color={'#fff'}/>}
+        </TouchableOpacity>
+        </View>
       </View>
       <View style={styles.EditView}>
         {editMail ? (
@@ -350,13 +359,13 @@ const MeScreen = ({ navigation }) => {
             <Text style={{ color: '#fff', paddingLeft: 10 }}>{userEmail}</Text>
           </View>
         )}
-        <Pressable
+        <TouchableOpacity
           onPress={() => {
             toggleEditMail();
             setUserEmail(updateUserEmail);
           }}>
-          {!editMail ? <Text style={{color: '#46eeaa'}}>Edit</Text> : <Text>Done</Text>}
-        </Pressable>
+          {!editMail ? <Icon name="edit" color={'#fff'} size={20}></Icon> : <Icon name="done" size={20} color={'#fff'}/>}
+        </TouchableOpacity>
       </View>
       {/*<View style={styles.EditView}>
         {editPhone ? (
@@ -384,25 +393,25 @@ const MeScreen = ({ navigation }) => {
       </View>*/}
 
 
-      <Pressable style={styles.button}
+      <TouchableOpacity style={styles.button}
         onPress={() => {
           console.log("Press save")
           SettingProfile(userFirstName, userLastName, userEmail, userPhoto, updateUserFirstName, updateUserLastName, updateUserEmail, updateUserPhoto);
         }}>
         <Text style={{ color: "#fff", fontWeight: 'bold' }}>Save</Text>
-      </Pressable>
-      <Pressable style={styles.button}
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button}
         onPress={() => {
           navigation.navigate("ChangePassword");
         }}>
         <Text style={{ color: "#fff", fontWeight: 'bold' }}>Change Password</Text>
-      </Pressable>
-      <Pressable style={styles.button}
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button}
         onPress={() => {
           SignOut();
         }}>
         <Text style={{ color: "#fff", fontWeight: 'bold' }}>SignOut</Text>
-      </Pressable>
+      </TouchableOpacity>
 
 
     </View>
@@ -422,6 +431,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
+    marginBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#aeaeae",
+    height: 60,
+  },
+  EditViewForName: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '47%',
     marginBottom: 15,
     borderBottomWidth: 1,
     borderBottomColor: "#aeaeae",

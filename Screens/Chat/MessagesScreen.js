@@ -153,7 +153,8 @@ import { View, Text, Image, TouchableOpacity} from "react-native";
 import firestore, { firebase } from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
 import { FlatList } from "react-native-gesture-handler";
-
+import database from "@react-native-firebase/database";
+import { ref } from "yup";
 const MessagesScreen = ({ navigation }) => {
   const [chatData, setChatData] = useState({});
   const [chatDataArray, setChatDataArray] = useState([]);
@@ -174,19 +175,45 @@ const MessagesScreen = ({ navigation }) => {
     console.log(chatroomId);
     navigation.navigate('Chat', {
       docid: chatroomId,
+      name: name,
+      image: image,
       
     });
   }
 
-  
-
-
-
   useEffect(() => {
+    console.log('START');
+    const isOfflineForDatabase = {
+      state: 'offline',
+      last_changed: firebase.database.ServerValue.TIMESTAMP,
+    };
 
+    const isOnlineForDatabase = {
+      state: 'online',
+      last_changed: firebase.database.ServerValue.TIMESTAMP,
+    };
+    const userId = auth().currentUser.uid;
+
+    const reference = database().ref(`/status/${userId}`);
+    database()
+      .ref('.info/connected')
+      .on('value', snapshot => {
+        console.log(snapshot.val());
+        if (snapshot.val() == false) {
+          reference.set(isOfflineForDatabase);
+          return;
+        }
+        reference
+          .onDisconnect()
+          .set(isOfflineForDatabase)
+          .then(() => {
+            console.log('disconnected function set');
+            reference.set(isOnlineForDatabase);
+          });
+      });
     async function fromChat() {
       let arr = [];
-      console.log("START");
+      console.log('start')
       try {
         await firebase
           .firestore()
@@ -213,11 +240,11 @@ const MessagesScreen = ({ navigation }) => {
               getUserData(chatData.userId).then((item) => {
                 chatData.name = item.name;
                 chatData.image = item.image;
-                chatData.status = item.status;
+                
 
                 console.log("Name:: ", chatData.name);
                 console.log("Image:: ", chatData.image);
-                console.log("Status:: ", chatData.status);
+                
 
                 let time1 = documentSnapshot.data().latestTime;
                 let time2 = new Date(time1 * 1000);
@@ -241,9 +268,7 @@ const MessagesScreen = ({ navigation }) => {
       }
     }
     fromChat();
-    return () => {
-      activeStatus.remove();
-    }
+    
   }, []);
 
   const getUserData = async (id) => {
