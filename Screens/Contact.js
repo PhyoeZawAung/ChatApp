@@ -8,7 +8,7 @@ import {
   Button,
   TextInput,
   ActivityIndicator,
-  Pressable
+  Pressable,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -153,20 +153,26 @@ const ContactScreen = ({navigation}) => {
     return <ActivityIndicator />;
   }
   return (
-    <View style={{ backgroundColor: '#4F3B70', flex: 1 }}>
-      
-      <View style={{ padding: 20 }}>
-        <Pressable style={{ position: 'absolute', left: 20, top: 30 }}
-      onPress={()=>navigation.goBack()}>
-        <Icon name="arrowleft" type="ant-design" size={30} color={ "#fff"} />
-      </Pressable>
-        <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold',marginLeft:60}}>
+    <View style={{backgroundColor: '#4F3B70', flex: 1}}>
+      <View style={{padding: 20}}>
+        <Pressable
+          style={{position: 'absolute', left: 20, top: 30}}
+          onPress={() => navigation.goBack()}>
+          <Icon name="arrowleft" type="ant-design" size={30} color={'#fff'} />
+        </Pressable>
+        <Text
+          style={{
+            fontSize: 32,
+            color: 'white',
+            fontWeight: 'bold',
+            marginLeft: 60,
+          }}>
           Contacts
         </Text>
         <View style={{flexDirection: 'row', marginTop: 20}}>
           <TextInput
             style={{
-              width: '80%',
+              width: '100%',
               backgroundColor: '#ffffff',
               height: 50,
               borderRadius: 20,
