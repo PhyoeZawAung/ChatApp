@@ -44,7 +44,7 @@ const ContactScreen = ({navigation}) => {
         });
 
         setAllUsers(user.filter(it => it.key != auth().currentUser.uid));
-        setAllUsersBackup(user.filter(it => it.key != auth().currentUser.uid))
+        setAllUsersBackup(user.filter(it => it.key != auth().currentUser.uid));
         setLoading(false);
 
         // see next step
@@ -69,7 +69,13 @@ const ContactScreen = ({navigation}) => {
           }}>
           <TouchableOpacity
             onPress={() => {
-              handlechat(item.key);
+              handlechat(
+                item.key,
+                item.firstName,
+                item.lastName,
+                item.photoURL,
+                item.status,
+              );
             }}>
             <View
               style={{
@@ -105,7 +111,7 @@ const ContactScreen = ({navigation}) => {
       </View>
     );
   };
-  const handlechat = async receiver => {
+  const handlechat = async (receiver, firstName, lastName, image, status) => {
     await firestore()
       .collection('chatroom')
       .get()
@@ -120,7 +126,13 @@ const ContactScreen = ({navigation}) => {
             (user0 == currentUserId && user1 == receiver)
           ) {
             console.log('Chat Room already exist');
-            navigation.navigate('Chat', {docid: documentSnapshot.id});
+            navigation.navigate('Chat', {
+              docid: documentSnapshot.id,
+              firstName: firstName,
+              lastName: lastName,
+              image: image,
+              status: status,
+            });
             exist = true;
             return false;
           }
@@ -135,7 +147,13 @@ const ContactScreen = ({navigation}) => {
             })
             .then(docRef => {
               const docid = docRef.id;
-              navigation.navigate('Chat', {docid});
+              navigation.navigate('Chat', {
+                docid,
+                firstName,
+                lastName,
+                image,
+                status,
+              });
               console.log(docRef.id);
               console.log('Chat Room Created');
             })
@@ -178,11 +196,9 @@ const ContactScreen = ({navigation}) => {
               borderRadius: 20,
               padding: 15,
             }}
-            onChangeText={(newText) => {
-             
-              search(newText)
-            }
-            }
+            onChangeText={newText => {
+              search(newText);
+            }}
             value={username}
             placeholder="Search"
             placeholderTextColor="#000000"
