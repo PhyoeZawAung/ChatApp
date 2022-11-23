@@ -34,7 +34,7 @@ export default function AddScreen({navigation}) {
         admin: user1,
         groupMember,
         latestTime: date,
-        latestMessage: 'Group created',
+        latestMessages: 'Group created',
       })
       .then(doc => {
         const groupId = doc.id;
