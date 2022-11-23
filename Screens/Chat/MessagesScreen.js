@@ -185,7 +185,7 @@ const MessagesScreen = ({ navigation }) => {
                 style={{
                   position: "absolute",
                   top: 22,
-                  right: 25,
+                  right: 10,
                   fontSize: 13,
                   fontWeight: "600",
                   color: "#606060",

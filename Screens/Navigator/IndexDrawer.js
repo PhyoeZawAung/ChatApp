@@ -39,7 +39,7 @@ return (
               </View>
               <View style={styles.text}>
                 <Text style={styles.name}>{route.params.firstName+ " " + route.params.lastName}</Text>
-                <Text style={styles.status}>online</Text>
+                <Text style={styles.status}></Text>
               </View>
             </View>
           )
