@@ -143,7 +143,7 @@ const MessagesScreen = ({ navigation }) => {
                 borderBottomColor:'#cccccc'
               }}
             >
-              <View style={{ marginRight: 40 }}>
+              <View style={{ marginRight: 20 }}>
                 <Avatar
                   title={item.firstName[0]+item.lastName[0]}
                   size={50}
@@ -185,7 +185,7 @@ const MessagesScreen = ({ navigation }) => {
                 style={{
                   position: "absolute",
                   top: 22,
-                  right: 10,
+                  right: 0,
                   fontSize: 13,
                   fontWeight: "600",
                   color: "#606060",
