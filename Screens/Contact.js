@@ -44,7 +44,7 @@ const ContactScreen = ({navigation}) => {
         });
 
         setAllUsers(user.filter(it => it.key != auth().currentUser.uid));
-        setAllUsersBackup(user.filter(it => it.key != auth().currentUser.uid));
+        setAllUsersBackup(user.filter(it => it.key != auth().currentUser.uid))
         setLoading(false);
 
         // see next step
@@ -178,13 +178,28 @@ const ContactScreen = ({navigation}) => {
               borderRadius: 20,
               padding: 15,
             }}
-            onChangeText={newText => {
-              search(newText);
-            }}
+            onChangeText={(newText) => {
+             
+              search(newText)
+            }
+            }
             value={username}
             placeholder="Search"
             placeholderTextColor="#000000"
           />
+          <TouchableOpacity
+            //onPress={() => search(username)}
+            style={{
+              backgroundColor: '#ffffff',
+              width: '11%',
+              height: 40,
+              right: 0,
+              position: 'absolute',
+              borderRadius: 100,
+              justifyContent: 'center',
+            }}>
+            <Icon name="search" size={30} />
+          </TouchableOpacity>
         </View>
       </View>
       <FlatList data={allusers} renderItem={renderItem}></FlatList>

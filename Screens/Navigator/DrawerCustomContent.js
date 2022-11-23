@@ -65,7 +65,7 @@ const CustomContent = props => {
                 size={100}
                 rounded
                   title={user.firstName[0] + user.lastName[0]}
-                containerStyle={{ backgroundColor: 'grey' }}>
+                containerStyle={{ backgroundColor: '#3fb585' }}>
                 </Avatar>
                 
               ) : (

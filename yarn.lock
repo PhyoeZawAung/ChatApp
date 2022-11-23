@@ -1379,6 +1379,11 @@
     "@expo/config-plugins" "^5.0.1"
     "plist" "^3.0.5"
 
+"@react-native-firebase/database@^16.4.6":
+  "integrity" "sha512-vBKqANcCSOkfPUM7cNRIuoHm/RnHDOFzXnW1cZKqhHD4mU7t+GtJwB4yHtAvt0v2dU5e4Oqm8MitDPfMAJ6mcw=="
+  "resolved" "https://registry.npmjs.org/@react-native-firebase/database/-/database-16.4.6.tgz"
+  "version" "16.4.6"
+
 "@react-native-firebase/firestore@^16.4.3":
   "integrity" "sha512-T68PkKZzTfXTU8cUJTUUBBKQ4rNZ+XUHGoh38FHqTOLeSATyKa22oDuS+eOtakUSZTUnUEcquJmH5AvqSfsO3A=="
   "resolved" "https://registry.npmjs.org/@react-native-firebase/firestore/-/firestore-16.4.3.tgz"
