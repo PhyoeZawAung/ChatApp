@@ -8,9 +8,9 @@ import {
   Button,
   TextInput,
   ActivityIndicator,
-  Pressable
+  Pressable,
 } from 'react-native';
-import firestore, {firebase} from '@react-native-firebase/firestore';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {FlatList} from 'react-native-gesture-handler';
 import ChatScreen from './Chat/Chat';
@@ -21,6 +21,7 @@ const ContactScreen = ({navigation}) => {
   const [currentUserId, setCurrentUserId] = useState();
   const [loading, setLoading] = useState(true);
   const [chatRooms, setChatRooms] = useState([]);
+  const [allUsersBackup, setAllUsersBackup] = useState([]);
   const [username, setusername] = useState();
 
   const date = new Date();
@@ -43,6 +44,7 @@ const ContactScreen = ({navigation}) => {
         });
 
         setAllUsers(user.filter(it => it.key != auth().currentUser.uid));
+        setAllUsersBackup(user.filter(it => it.key != auth().currentUser.uid));
         setLoading(false);
 
         // see next step
@@ -51,30 +53,8 @@ const ContactScreen = ({navigation}) => {
     // Unsubscribe from events when no longer in use
     return () => subscriber();
   }, []);
-  const initialState = [{}];
   const search = text => {
-    setAllUsers(initialState);
-    console.log(allusers);
-    let searchuser = firebase
-      .firestore()
-      .collection('users')
-      .onSnapshot(querySnapshot => {
-        const user = [];
-        querySnapshot.forEach(documentSnapshot => {
-          user.push({
-            ...documentSnapshot.data(),
-            key: documentSnapshot.id,
-            fullname:
-              documentSnapshot.data().firstName +
-              ' ' +
-              documentSnapshot.data().lastName,
-          });
-        });
-        setAllUsers(user.filter(it => it.key != auth().currentUser.uid));
-        setLoading(false);
-      });
-    data = allusers;
-    setAllUsers(data.filter(data => data.fullname.includes(text)));
+    setAllUsers(allUsersBackup.filter(it => it.fullname.match(text)));
   };
   const renderItem = ({item}) => {
     return (
@@ -173,43 +153,38 @@ const ContactScreen = ({navigation}) => {
     return <ActivityIndicator />;
   }
   return (
-    <View style={{ backgroundColor: '#4F3B70', flex: 1 }}>
-      
-      <View style={{ padding: 20 }}>
-        <Pressable style={{ position: 'absolute', left: 20, top: 30 }}
-      onPress={()=>navigation.goBack()}>
-        <Icon name="arrowleft" type="ant-design" size={30} color={ "#fff"} />
-      </Pressable>
-        <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold',marginLeft:60}}>
+    <View style={{backgroundColor: '#4F3B70', flex: 1}}>
+      <View style={{padding: 20}}>
+        <Pressable
+          style={{position: 'absolute', left: 20, top: 30}}
+          onPress={() => navigation.goBack()}>
+          <Icon name="arrowleft" type="ant-design" size={30} color={'#fff'} />
+        </Pressable>
+        <Text
+          style={{
+            fontSize: 32,
+            color: 'white',
+            fontWeight: 'bold',
+            marginLeft: 60,
+          }}>
           Contacts
         </Text>
         <View style={{flexDirection: 'row', marginTop: 20}}>
           <TextInput
             style={{
-              width: '80%',
+              width: '100%',
               backgroundColor: '#ffffff',
               height: 50,
               borderRadius: 20,
               padding: 15,
             }}
-            onChangeText={newText => setusername(newText)}
+            onChangeText={newText => {
+              search(newText);
+            }}
             value={username}
             placeholder="Search"
             placeholderTextColor="#000000"
           />
-          <TouchableOpacity
-            onPress={() => search(username)}
-            style={{
-              backgroundColor: '#ffffff',
-              width: '11%',
-              height: 40,
-              right: 0,
-              position: 'absolute',
-              borderRadius: 100,
-              justifyContent: 'center',
-            }}>
-            <Icon name="search" size={30} />
-          </TouchableOpacity>
         </View>
       </View>
       <FlatList data={allusers} renderItem={renderItem}></FlatList>

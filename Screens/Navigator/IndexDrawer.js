@@ -14,7 +14,7 @@ function IndexScreen() {
         component={MessagesScreen}
         options={({navigation, route}) => ({
           headerRight: () => (
-            <TouchableOpacity onPress={() => navigation.navigate('search')}>
+            <TouchableOpacity onPress={() => navigation.navigate('Contact')}>
               <Icon
                 name="search"
                 color="#4F3B70"
