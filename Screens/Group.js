@@ -69,7 +69,7 @@ export default function MainScreen({navigation}) {
                     marginHorizontal: 20,
                     borderBottomColor:'#cccccc'
                   }}>
-                  <Avatar title={item.groupName[0]+item.groupName[1]} size={60}
+                  <Avatar title={item.groupName[0]+item.groupName[1]} size={50}
                     containerStyle={{ backgroundColor: "#4F3B70" }}
                    rounded/>
                   <View style={{ flexDirection: 'column' ,marginLeft:20,}}>
