@@ -31,6 +31,7 @@ return (
             <View style={styles.container}>
               <View>
                 <Avatar 
+                  title={route.params.firstName[0] + route.params.lastName[0]}
                   size={40}
                   rounded
                   containerStyle={{ backgroundColor: "#4F3B70"}}
