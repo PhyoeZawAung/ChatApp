@@ -211,7 +211,7 @@ const MessagesScreen = ({ navigation }) => {
     <View style={{ backgroundColor: "#4F3B70" }}>
       <View style={{ padding: 20 }}>
         <Text style={{ fontSize: 32, color: "white", fontWeight: "bold" }}>
-          Chat
+          My Chatlists
         </Text>
       </View>
       <View
