@@ -8,6 +8,7 @@ import {
   TouchableHighlight,
   TouchableOpacity,
   ToastAndroid,
+  Modal,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {useEffect} from 'react';
@@ -302,12 +303,14 @@ const GroupInfoScreen = ({navigation}) => {
             <Dialog.Loading />
           </Dialog>
         ) : (
+          
           <Dialog
             isVisible={dialogVisible}
             onBackdropPress={() => setDialogVisible(false)}
-            overlayStyle={{backgroundColor: '#fff', height: 500}}>
-            <Dialog.Title title="Add Member" />
-            <View>
+            overlayStyle={{backgroundColor: '#fff', height: 500,borderRadius:10}}>
+              <Dialog.Title title="Add Member" />
+            
+            <View style={{height:370}}>
               <FlatList data={allUsers} renderItem={renderInDialog} />
             </View>
             <TouchableOpacity
@@ -318,7 +321,8 @@ const GroupInfoScreen = ({navigation}) => {
               <View style={{flexDirection: 'row'}}>
                 <Text style={{color: '#fff', paddingLeft: 8}}>Done</Text>
               </View>
-            </TouchableOpacity>
+                </TouchableOpacity>
+              
           </Dialog>
         )}
         <Text
