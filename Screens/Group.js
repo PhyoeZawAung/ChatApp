@@ -90,7 +90,8 @@ export default function MainScreen({navigation}) {
                   <Text
                     style={{
                       position: 'absolute',
-                      right: 25,
+                      top: 26,
+                      right: 0,
                       fontSize: 13,
                       fontWeight: "600",
                       color: "#606060",
