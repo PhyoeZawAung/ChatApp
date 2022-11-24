@@ -8,7 +8,7 @@ import {
   Button,
   TextInput,
   ActivityIndicator,
-  Pressable
+  Pressable,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -43,7 +43,7 @@ const ContactScreen = ({navigation}) => {
         });
  
         setAllUsers(user.filter(it => it.key != auth().currentUser.uid));
-        setAllUsersBackup(user.filter(it => it.key != auth().currentUser.uid))
+        setAllUsersBackup(user.filter(it => it.key != auth().currentUser.uid));
         setLoading(false);
 
         // see next step
@@ -186,11 +186,9 @@ const ContactScreen = ({navigation}) => {
               borderRadius:22,
               paddingLeft:40,
             }}
-            onChangeText={(newText) => {
-             
-              search(newText)
-            }
-            }
+            onChangeText={newText => {
+              search(newText);
+            }}
             value={username}
             placeholder={"Search"}
             placeholderTextColor="#909090"

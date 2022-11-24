@@ -1,7 +1,7 @@
-import {View, Text, ScrollView, FlatList} from 'react-native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {useState} from 'react';
-import {firebase} from '@react-native-firebase/firestore';
+import { View, Text, ScrollView, FlatList } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useState } from 'react';
+import { firebase } from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import { useEffect } from 'react';
 import { Avatar } from '@rneui/base';
@@ -9,21 +9,32 @@ import { Avatar } from '@rneui/base';
 export default function MainScreen({navigation}) {
   const [group, setgroup] = useState([]);
   const ref = firebase.firestore().collection('group');
-  const chatroom = (groupId ,groupName)=> {
-    navigation.navigate('Groupchat', {groupId,groupName});
+  const chatroom = (groupId, groupName) => {
+    navigation.navigate('Groupchat', { groupId, groupName });
   };
-  
+  function convertTime(date) {
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var ampm = hours >= 12 ? "pm" : "am";
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    var time = hours + ":" + minutes + " " + ampm;
+    return time;
+  }
+ 
   useEffect(() => {
     const subscriber = ref.where('groupMember', 'array-contains', auth().currentUser.uid)
       .onSnapshot(querySnapshot => {
         let group = [];
         querySnapshot.forEach(doc => {
-          let mygroup = doc.data();
+        let mygroup = doc.data();
         mygroup.id = doc.id;
-        mygroup.latestTime =
-          doc.data().latestTime.toDate().getHours() +
-          ':' +
-          doc.data().latestTime.toDate().getMinutes();
+
+        let time1 = doc.data().latestTime;
+        let time2 = new Date(time1 * 1000);
+        mygroup.latestTime = convertTime(time2);
+        
         group.push(mygroup);
         })
         setgroup(group);
@@ -31,9 +42,9 @@ export default function MainScreen({navigation}) {
     return () => subscriber();
   },[])
   return (
-    <View style={{backgroundColor: '#4F3B70'}}>
-      <View style={{padding: 20}}>
-        <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold'}}>
+    <View style={{ backgroundColor: '#4F3B70' }}>
+      <View style={{ padding: 20 }}>
+        <Text style={{ fontSize: 32, color: 'white', fontWeight: 'bold' }}>
           My Groups
         </Text>
       </View>
@@ -45,9 +56,9 @@ export default function MainScreen({navigation}) {
         }}>
         <FlatList
           data={group}
-          renderItem={({item}) => (
+          renderItem={({ item }) => (
             <View>
-              <TouchableOpacity onPress={() => chatroom(item.id,item.groupName)}>
+              <TouchableOpacity onPress={() => chatroom(item.id, item.groupName)}>
                 <View
                   style={{
                     flexDirection: "row",
