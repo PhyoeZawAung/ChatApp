@@ -206,11 +206,21 @@ function ChatScreen({navigation}) {
       </View>
     );
   };
+  const customRenderSend = (props) => {
+    return (
+      <Send {...props}>
+        <View  style={{marginRight: 20, marginBottom: 12}}>
+          <Icon name='send' size={22} color={'#1266ff'} />
+        </View>
+        
+      </Send>
+    )
+  }
   return (
     <GiftedChat
       renderActions={customRenderAction}
       renderComposer={props1 => (
-        <Composer {...props1} textInputStyle={{color: 'blue'}} />
+        <Composer {...props1} textInputStyle={{color: '#4F3B70'}} />
       )}
       messages={messages}
       showAvatarForEveryMessage={true}
@@ -220,7 +230,9 @@ function ChatScreen({navigation}) {
         name: auth().currentUser.displayName,
         avatar: auth().currentUser.photoURL,
       }}
-      renderMessageImage={customRenderMessageImage}></GiftedChat>
+      renderMessageImage={customRenderMessageImage}
+      renderSend={customRenderSend}>
+      </GiftedChat>
   );
 }
 
