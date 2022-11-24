@@ -82,6 +82,10 @@ const ChangePasswordScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
+       <Pressable style={{ position: 'absolute', left: 20, top: 20 }}
+      onPress={()=>navigation.goBack()}>
+        <Icon name="arrowleft" type="ant-design" size={30} color={ "#fff"} />
+      </Pressable>
       <View style={styles.signUpCard}>
         <Text style={styles.header}>Create A New Password</Text>
         <Text style={styles.text}>Your new Password Must Be Different from the old password</Text>

@@ -15,7 +15,12 @@ function GroupScreen() {
       <GroupStack.Screen
         name="My Group"
         component={MainScreen}
-        options={({navigation, route}) => ({
+        options={({ navigation, route }) => ({
+          headerLeft: () => (
+            <TouchableOpacity style={{marginHorizontal:20}} onPress={()=>navigation.goBack()}>
+              <Icon name="arrowleft" type="ant-design" size={30} />
+          </TouchableOpacity>  
+          ),
           headerRight: () => (
             <TouchableOpacity
               onPress={() => navigation.navigate('Create Group')}>

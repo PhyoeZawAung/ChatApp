@@ -72,7 +72,13 @@ const GroupInfoScreen = ({navigation}) => {
     });
   };
   if (loading) {
-    return <ActivityIndicator />;
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size={40}/>
+        <Text>Getting Group informations......</Text>
+        
+      </View>
+    )
   }
   const removeFromGroup = uid => {
     const index = groupMember.indexOf(uid);
@@ -192,7 +198,7 @@ const GroupInfoScreen = ({navigation}) => {
             alignItems: 'center',
           }}>
           <Avatar
-            title={item.firstName + ' ' + item.lastName}
+            title={item.firstName[0] + item.lastName[0]}
             size={40}
             containerStyle={{backgroundColor: 'grey'}}
             rounded

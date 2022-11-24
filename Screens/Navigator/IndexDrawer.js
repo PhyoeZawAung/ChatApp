@@ -4,21 +4,22 @@ import MessagesScreen from '../Chat/MessagesScreen';
 import ChatScreen from '../Chat/Chat';
 import SearchScreen from '../Chat/Search';
 import { Button, Icon, Avatar } from '@rneui/base';
+import { DrawerActions } from '@react-navigation/native';
 
 const HomeStack = createStackNavigator();
-function IndexScreen() {
+function IndexScreen({navigation}) {
 return (
     <HomeStack.Navigator>
       <HomeStack.Screen
         name="Messages"
         component={MessagesScreen}
         options={({ navigation, route }) => ({
-          headerRight: () => (
-            <TouchableOpacity onPress={() => navigation.navigate('search')}>
+          headerLeft: () => (
+            <TouchableOpacity onPress={()=>navigation.openDrawer()}>
               <Icon
-                name="search"
-                color="#4F3B70"
-                style={{ marginRight: 20, fontSize: 20 }}
+                name="menu-open"
+                size={30}
+                style={{ marginHorizontal: 20, }}
               />
             </TouchableOpacity>
           ),
@@ -29,17 +30,25 @@ return (
           headerTitle: () => (
             <View style={styles.container}>
               <View>
-                <Image
-                  style={styles.image}
+                <Avatar 
+                  size={40}
+                  rounded
+                  containerStyle={{ backgroundColor: "#4F3B70"}}
                   source={
                     route.params?.image
                       ? { uri: route.params.image }
-                      : require('../../images/default_image.png')}
+                      : null}
                 />
+               
               </View>
               <View style={styles.text}>
-                <Text style={styles.name}>{route.params.firstName+ " " + route.params.lastName}</Text>
-                <Text style={styles.status}>online</Text>
+                <Text style={styles.name}>{route.params.firstName + " " + route.params.lastName}</Text>
+                
+                {
+                  route.params.status?.state == 'online' ? (<Text
+                    style={styles.status}>online</Text>) : (<Text
+                      style={styles.status}>Offline</Text>)
+                }
               </View>
             </View>
           )
@@ -72,6 +81,7 @@ const styles = StyleSheet.create({
   },
 
   text: {
+    marginLeft:16,
     display: 'flex',
     flexDirection: 'column',
     paddingVertical: 0,

@@ -54,6 +54,12 @@ export default function AddScreen({navigation}) {
     console.log(members);
     console.log(groupMember);
     console.log('Member', namer);
+
+    ToastAndroid.showWithGravity(
+      `added ${namer}`,
+      ToastAndroid.SHORT,
+      ToastAndroid.BOTTOM,
+    )
   };
 
   const name = firebase
@@ -67,7 +73,7 @@ export default function AddScreen({navigation}) {
         user.id = documentSnapshot.id;
         users.push(user);
       });
-      setUsers([...users, users]);
+      setUsers([...users]);
     });
   // useEffect(() => {
   //   let array = setUsers.map((item, index) => {
@@ -119,29 +125,28 @@ export default function AddScreen({navigation}) {
               <View
                 style={{
                   borderBottomColor: '#4F3B70',
-                  borderWidth: 1,
+                  borderBottomWidth: 0.5,
                   flexDirection: 'row',
                   backgroundColor: '#ffffff',
                   alignItems: 'center',
                   paddingHorizontal: 20,
+                  marginHorizontal:12,
                   paddingVertical: 20,
                 }}>
-                <Image
-                  source={
-                    item?.photoURL
-                      ? {uri: item?.photoURL}
-                      : require('../images/default_image.png')
-                  }
-                  style={{height: 40, width: 40, marginRight: 60}}
-                />
-                <Text style={{color: '#4F3B70', fontWeight: 'bold'}}>
-                  {item.firstName}
-
-                  {item.lastName}
+                
+                <Avatar title={item.firstName[0] + ' ' + item.lastName[0]} size={50} rounded
+                  containerStyle={{backgroundColor:"#4F3B70"}}
+                 source={
+                  item?.photoURL
+                    ? {uri: item?.photoURL}
+                    : null}/>
+                
+                <Text style={{color: '#4F3B70', fontWeight: 'bold',marginLeft:20}}>
+                  {item.firstName+' ' +item.lastName}
                 </Text>
                 <View
                   style={{
-                    backgroundColor: '#4F3B70',
+                    
                     paddingHorizontal: 20,
                     paddingVertical: 10,
                     position: 'absolute',
@@ -150,10 +155,18 @@ export default function AddScreen({navigation}) {
                   }}>
                   <TouchableOpacity
                     disabled={isMember}
-                    onPress={() => addMember(item.id, item.firstName)}>
-                    <Text style={{color: '#ffffff'}}>
-                      {isMember ? 'Added' : 'Add'}
-                    </Text>
+                    onPress={() => addMember(item.id, item.firstName +' '+ item.lastName)}>
+                    {isMember ? <Icon
+                               name="check"
+                               type="ant-design"
+                               size={24}
+                               color={'#3fb585'}
+                 /> : <Icon
+                                  name="addusergroup"
+                                  type="ant-design"
+                                  size={24}
+                                  color={'#0c93f4'}/>}
+                   
                   </TouchableOpacity>
                 </View>
               </View>

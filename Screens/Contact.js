@@ -14,7 +14,7 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {FlatList} from 'react-native-gesture-handler';
 import ChatScreen from './Chat/Chat';
-import {Icon} from '@rneui/base';
+import {Avatar, Icon} from '@rneui/base';
 
 const ContactScreen = ({navigation}) => {
   const [allusers, setAllUsers] = useState([]);
@@ -36,13 +36,12 @@ const ContactScreen = ({navigation}) => {
           user.push({
             ...documentSnapshot.data(),
             key: documentSnapshot.id,
-            fullname:
-              documentSnapshot.data().firstName +
-              ' ' +
-              documentSnapshot.data().lastName,
+            fullname:( documentSnapshot.data().firstName +
+              ' ' + documentSnapshot.data().lastName
+            ).toLowerCase()            
           });
         });
-
+ 
         setAllUsers(user.filter(it => it.key != auth().currentUser.uid));
         setAllUsersBackup(user.filter(it => it.key != auth().currentUser.uid))
         setLoading(false);
@@ -54,47 +53,49 @@ const ContactScreen = ({navigation}) => {
     return () => subscriber();
   }, []);
   const search = text => {
+    text = text.toLowerCase();
     setAllUsers(allUsersBackup.filter(it => it.fullname.match(text)));
   };
   const renderItem = ({item}) => {
     return (
-      <View>
+      <View
+      style={{
+        backgroundColor: '#ffffff',
+      }}>
         <View
           style={{
-            marginTop: 20,
-            borderRadius: 20,
-            marginTop: 27,
-            backgroundColor: '#ffffff',
-            marginHorizontal: 20,
+            marginHorizontal:16,
+            borderBottomColor: "#cccccc",
+            borderBottomWidth:0.5,
           }}>
           <TouchableOpacity
             onPress={() => {
-              handlechat(item.key);
+              handlechat(item.key,item.firstName,item.lastName,item.photoURL);
             }}>
             <View
               style={{
                 flexDirection: 'row',
-                paddingHorizontal: 20,
-                paddingVertical: 20,
+                paddingHorizontal: 16,
+                paddingVertical: 16,
                 alignItems: 'center',
               }}>
-              <View style={{marginRight: 40}}>
-                <Image
+              <View style={{ marginRight:16 }}>
+                <Avatar title={item.firstName[0] + item.lastName[0]}
+                  size={50}
+                  rounded
+                  containerStyle={{ backgroundColor: "#4F3B70" }}
                   source={
                     item?.photoURL
                       ? {uri: item?.photoURL}
-                      : require('../images/default_image.png')
-                  }
-                  style={{width: 50, height: 50, borderRadius: 100}}
-                />
+                      : null
+                  }/>
               </View>
               <View style={{flexDirection: 'column'}}>
                 <Text
                   style={{
                     fontSize: 16,
-                    fontWeight: 'bold',
-                    color: '#000000',
-                    marginBottom: 5,
+                    fontWeight: '700',
+                    color: '#606060',
                   }}>
                   {item.firstName + ' ' + item.lastName}
                 </Text>
@@ -105,7 +106,7 @@ const ContactScreen = ({navigation}) => {
       </View>
     );
   };
-  const handlechat = async receiver => {
+  const handlechat = async (receiver,firstName,lastName,image) => {
     await firestore()
       .collection('chatroom')
       .get()
@@ -120,7 +121,7 @@ const ContactScreen = ({navigation}) => {
             (user0 == currentUserId && user1 == receiver)
           ) {
             console.log('Chat Room already exist');
-            navigation.navigate('Chat', {docid: documentSnapshot.id});
+            navigation.navigate('Chat', { docid: documentSnapshot.id, firstName:firstName,lastName:lastName,image:image});
             exist = true;
             return false;
           }
@@ -135,7 +136,7 @@ const ContactScreen = ({navigation}) => {
             })
             .then(docRef => {
               const docid = docRef.id;
-              navigation.navigate('Chat', {docid});
+              navigation.navigate('Chat', {docid,firstName:firstName,lastName:lastName,image:image});
               console.log(docRef.id);
               console.log('Chat Room Created');
             })
@@ -150,27 +151,40 @@ const ContactScreen = ({navigation}) => {
   };
 
   if (loading) {
-    return <ActivityIndicator />;
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Loading All Users....</Text>
+        <ActivityIndicator size={40}/>
+        </View>
+    )
   }
   return (
-    <View style={{ backgroundColor: '#4F3B70', flex: 1 }}>
+    <View style={{ backgroundColor: '#4F3B70',}}>
       
-      <View style={{ padding: 20 }}>
-        <Pressable style={{ position: 'absolute', left: 20, top: 30 }}
+      <View style={{ paddingTop: 10 }}>
+        <Pressable style={{ position: 'absolute', left: 20, top: 20 }}
       onPress={()=>navigation.goBack()}>
         <Icon name="arrowleft" type="ant-design" size={30} color={ "#fff"} />
       </Pressable>
         <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold',marginLeft:60}}>
           Contacts
         </Text>
-        <View style={{flexDirection: 'row', marginTop: 20}}>
+        <View style={{
+          flexDirection: 'row', marginTop: 10, backgroundColor: "#fff", alignItems: 'center', justifyContent:'center',
+        }}>
+          <View style={{position:'absolute' ,right:40,zIndex:10,top:35,}}>
+            <Icon name="search" size={20} color={'#909090'} />
+          </View>
           <TextInput
             style={{
-              width: '80%',
-              backgroundColor: '#ffffff',
+              width: '90%',
+              backgroundColor: '#f0f0f0',
               height: 50,
-              borderRadius: 20,
-              padding: 15,
+              marginTop: 20,
+              marginBottom:6,
+              elevation: 2,
+              borderRadius:22,
+              paddingLeft:40,
             }}
             onChangeText={(newText) => {
              
@@ -178,213 +192,18 @@ const ContactScreen = ({navigation}) => {
             }
             }
             value={username}
-            placeholder="Search"
-            placeholderTextColor="#000000"
+            placeholder={"Search"}
+            placeholderTextColor="#909090"
           />
-          <TouchableOpacity
-            //onPress={() => search(username)}
-            style={{
-              backgroundColor: '#ffffff',
-              width: '11%',
-              height: 40,
-              right: 0,
-              position: 'absolute',
-              borderRadius: 100,
-              justifyContent: 'center',
-            }}>
-            <Icon name="search" size={30} />
-          </TouchableOpacity>
         </View>
       </View>
-      <FlatList data={allusers} renderItem={renderItem}></FlatList>
+      <View>
+       <FlatList style={{backgroundColor:"#fffff"}} data={allusers} renderItem={renderItem}></FlatList>
+      </View>
+      
     </View>
   );
 };
 
 export default ContactScreen;
-//class ContactScreen extends Component {
-//  state = {
-//    users: [],
-//    chatRooms: [],
-//    alreadyCreated: false,
-//  };
-//  checkRoom = async (data,user1,user2) => {
-//    return new Promise(() => {
-//      for (i = 0; i < data.length; i++){
-//        if (
-//          (user1 == data[i][0] && user2 == data[i][1]) ||
-//          (user1 == data[i][1] && user2 == data[i][0])
-//        ){
-//          console.log('Chat Room Already Exist');
-//          this.setState({alreadyCreated:true})
-//          break;
-//        }
-//      }
-//    })
-//
-//
-//  }
-//  handlechat = async (user1, user2) => {
-//    await firebase
-//      .firestore()
-//      .collection('chatroom')
-//      .get()
-//      .then(data => {
-//        let arr = [];
-//        data.forEach(room => {
-//          console.log(room.data());
-//          arr.push(room.data()['participantId']);
-//        });
-//        this.setState({chatRooms: arr});
-//        console.log('this is from chatRoom State array ', this.state.chatRooms);
-//      });
-//    if (this.state.chatRooms.length == 0) {
-//      console.log("No chatroom exists creating new one");
-//        firebase
-//          .firestore()
-//          .collection('chatroom')
-//          //.where(recieverId && senderId, '!=', recieverId && senderId)
-//          //.where('participantId.user1&&participantId.user2', '!=', user1 && user2)
-//          .add({
-//            participantId: [user1, user2],
-//            latestTime: '',
-//            latestMessages: '',
-//          })
-//          .then(docRef => {
-//            const docid = docRef.id;
-//            // this.props.navigation.navigate('Chat', {recieverId, docid});
-//
-//            this.props.navigation.navigate('Chat', {docid});
-//            console.log(docRef.id);
-//            console.log('Chat Room Created');
-//          })
-//          .catch(error => {
-//            console.error('Error adding document: ', error);
-//          });
-//    } else {
-//      let data = this.state.chatRooms;
-//      await this.checkRoom(data,user1,user2).then(() => {
-//        console.log(alreadyCreated);
-//       })
-////
-////      this.state.chatRooms.forEach(data => {
-////        console.log("this is incoming data" ,data)
-////        if (
-////          (user1 == data[0] && user2 == data[1]) ||
-////          (user1 == data[1] && user2 == data[0])
-////        ) {
-////          console.log('Chat Room Already Exist');
-////          this.setState({alreadyCreated: true});
-////        } else {
-////          console.log("Creating chat room");
-////          firebase
-////            .firestore()
-////            .collection('chatroom')
-////            //.where(recieverId && senderId, '!=', recieverId && senderId)
-////            //.where('participantId.user1&&participantId.user2', '!=', user1 && user2)
-////            .add({
-////              participantId: [user1, user2],
-////              latestTime: '',
-////              latestMessages: '',
-////            })
-////            .then(docRef => {
-////              const docid = docRef.id;
-////              // this.props.navigation.navigate('Chat', {recieverId, docid});
-////
-////              this.props.navigation.navigate('Chat', {docid});
-////              console.log(docRef.id);
-////              console.log('Chat Room Created');
-////            })
-////            .catch(error => {
-////              console.error('Error adding document: ', error);
-////            });
-////        }
-////      });
-//    }
-////
-//  };
-//  constructor(props) {
-//    super(props);
-//
-//
-//    this.senderId = auth().currentUser.uid;
-//    let sender = this.senderId;
-//    console.log(sender);
-//
-//    this.userId = firebase
-//      .firestore()
-//      .collection('users')
-//      .get()
-//      .then(querySnapshot => {
-//        let users = [];
-//        querySnapshot.forEach(documentSnapshot => {
-//          let user = documentSnapshot.data();
-//          user.id = documentSnapshot.id;
-//          users.push(user);
-//          //console.log('User data: ', users);
-//        });
-//        this.setState({users: users});
-//      });
-//  }
-//  render() {
-//    const {linkTo} = this.props;
-//    return (
-//      <ScrollView style={{backgroundColor: '#4F3B70'}}>
-//        <View style={{padding: 20}}>
-//          <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold'}}>
-//            Contacts
-//          </Text>
-//        </View>
-//        {this.state.users.map((user, index) => (
-//          <View
-//            key={index}
-//            style={{
-//              marginTop: 20,
-//              borderRadius: 20,
-//              marginTop: 27,
-//              backgroundColor: '#ffffff',
-//              marginHorizontal: 20,
-//            }}>
-//            <TouchableOpacity
-//              onPress={() => {
-//                this.handlechat(user.id, this.senderId);
-//              }}>
-//              <View
-//                style={{
-//                  flexDirection: 'row',
-//                  paddingHorizontal: 20,
-//                  paddingVertical: 20,
-//                  alignItems: 'center',
-//                }}>
-//                <View style={{marginRight: 40}}>
-//                  <Image
-//                    source={
-//                      user?.photoURL
-//                        ? {uri: user?.photoURL}
-//                        : require('../images/default_image.png')
-//                    }
-//                    style={{width: 50, height: 50, borderRadius: 100}}
-//                  />
-//                </View>
-//                <View style={{flexDirection: 'column'}}>
-//                  <Text
-//                    style={{
-//                      fontSize: 16,
-//                      fontWeight: 'bold',
-//                      color: '#000000',
-//                      marginBottom: 5,
-//                    }}>
-//                    {user.firstName}
-//                    {user.lastName}
-//                  </Text>
-//                </View>
-//              </View>
-//            </TouchableOpacity>
-//          </View>
-//        ))}
-//      </ScrollView>
-//    );
-//  }
-//}
-//
-//export default ContactScreen;
+

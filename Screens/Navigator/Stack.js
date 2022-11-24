@@ -17,6 +17,7 @@ import MeScreen from '../Me';
 import Home from './Drawer';
 import IndexScreen from './IndexDrawer';
 import { ActivityIndicator } from 'react-native';
+import { View ,Text} from 'react-native';
 const Stack = createStackNavigator();
 
 const StackScreen = () => {
@@ -36,7 +37,11 @@ const StackScreen = () => {
 
   if (initializing) {
     return (
-      <ActivityIndicator/>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent:'center'}}>
+        <Text>Loading.....</Text>
+        <ActivityIndicator size={50}/>
+      </View>
+      
     )
   };
 
